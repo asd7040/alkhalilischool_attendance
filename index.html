@@ -5,6 +5,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0f766e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="غياب الخليلي">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Reem+Kufi:wght@600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -262,6 +268,7 @@ body.haswbar .credit{padding-bottom:110px}
   <div class="userbar" id="userbar" hidden>
     <div class="me"><span class="av" id="av"></span><span id="who"></span></div>
     <span class="grow"></span>
+    <button class="hbtn" id="btnInstall2" hidden>📲 تثبيت</button>
     <button class="hbtn" id="btnPin">🔑 رقمي السري</button>
     <button class="hbtn" id="btnLogout">خروج</button>
   </div>
@@ -304,6 +311,8 @@ body.haswbar .credit{padding-bottom:110px}
       <p class="err" id="lgErr"></p>
       <button class="btn go block" type="submit" id="lgBtn">دخول ←</button>
     </form>
+    <button class="btn block" type="button" id="btnInstall" style="margin-top:12px" hidden>📲 تثبيت التطبيق على الجوال</button>
+    <p class="hint" id="installHint" style="margin:10px 0 0" hidden></p>
   </div>
 </section>
 
@@ -1214,6 +1223,31 @@ $("optStuEdit").addEventListener("change", async e => {
   try { SETTINGS = await api("apiSetSettings", TOKEN, { studentEdit: on }); toast(on ? "تم تمكين تعديل بيانات الطلاب للمسؤولين" : "تم إيقاف تعديل بيانات الطلاب للمسؤولين"); }
   catch(err){ e.target.checked = !on; toast(err.message); }
 });
+
+/* ================= تطبيق الجوال (PWA) ================= */
+(() => {
+  const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  const onWeb = /github\.io$/i.test(location.hostname);   // داخل Apps Script لا نسجّل التطبيق
+  if (onWeb && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+  if (standalone || !onWeb) return;
+  let deferred = null;
+  const btns = [$("btnInstall"), $("btnInstall2")], hint = $("installHint");
+  const show = on => btns.forEach(b => b.hidden = !on);
+  window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferred = e; show(true); hint.hidden = true; });
+  window.addEventListener("appinstalled", () => { deferred = null; show(false); toast("تم تثبيت التطبيق ✓ تجده في الشاشة الرئيسية"); });
+  btns.forEach(b => b.onclick = async () => {
+    if (!deferred) return;
+    deferred.prompt();
+    const r = await deferred.userChoice.catch(() => null);
+    if (r && r.outcome === "accepted") show(false);
+    deferred = null;
+  });
+  // آيفون: لا يوجد زر تثبيت تلقائي، نعرض الطريقة
+  if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
+    hint.hidden = false;
+    hint.textContent = "لتثبيت التطبيق على الآيفون: اضغط زر المشاركة ⬆️ في Safari ثم «إضافة إلى الشاشة الرئيسية».";
+  }
+})();
 
 /* ================= رقمي السري ================= */
 let pinFrom = null;
