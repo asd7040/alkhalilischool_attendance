@@ -589,7 +589,7 @@ const pname = p => "الحصة " + (PNAMES[p - 1] || p);
 /* ---------- server calls ----------
    داخل Apps Script: يستخدم google.script.run تلقائيًا.
    على GitHub Pages: ضع رابط Apps Script (الذي ينتهي بـ /exec) في API_URL. */
-const API_URL = "";
+const API_URL = "https://script.google.com/macros/s/AKfycbzD8zMaJm5C7vRrcGooijj8eYkZ81ulcRILHg1iBfHzAZUKanizE8RbVs3BkjEdDh-WFw/exec";
 let busy = 0;
 function callServer(fn, args){
   if (window.google && google.script && google.script.run){
