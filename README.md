@@ -1,1 +1,5 @@
-# alkhalilischool_attendace
+# سجل غياب الطلاب
+
+مدرسة الإمام محمد بن عبدالله الخليلي للبنين (10-12) — إعداد الأستاذ أسعد الوائلي
+
+الصفحة `index.html` تعمل على GitHub Pages، والبيانات تُحفظ في Google Sheets عن طريق Google Apps Script.
