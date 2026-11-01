@@ -262,6 +262,7 @@ body.haswbar .credit{padding-bottom:110px}
   <div class="userbar" id="userbar" hidden>
     <div class="me"><span class="av" id="av"></span><span id="who"></span></div>
     <span class="grow"></span>
+    <button class="hbtn" id="btnPin">🔑 رقمي السري</button>
     <button class="hbtn" id="btnLogout">خروج</button>
   </div>
   <nav class="tabs" id="tabs" hidden>
@@ -285,7 +286,7 @@ body.haswbar .credit{padding-bottom:110px}
     <p class="sub">أول تشغيل: أنشئ حساب المسؤول</p>
     <form id="setupForm" class="stack">
       <div class="field"><label for="suName">الاسم</label><input id="suName" required value="أسعد الوائلي"></div>
-      <div class="field"><label for="suUser">الرقم الوظيفي</label><input id="suUser" class="bigin" required inputmode="numeric" autocomplete="off" dir="ltr"></div>
+      <div class="field"><label for="suUser">الرقم السري</label><input id="suUser" type="password" class="bigin" required inputmode="numeric" autocomplete="off" dir="ltr"></div>
       <p class="err" id="suErr"></p>
       <button class="btn primary block" type="submit">إنشاء الحساب والدخول</button>
     </form>
@@ -297,9 +298,9 @@ body.haswbar .credit{padding-bottom:110px}
   <div class="card center">
     <div class="login-ic" aria-hidden="true">🔑</div>
     <p class="logo">تسجيل الدخول</p>
-    <p class="sub">اكتب رقمك الوظيفي للدخول مباشرة إلى تسجيل الغياب</p>
+    <p class="sub">اكتب رقمك السري للدخول مباشرة إلى تسجيل الغياب</p>
     <form id="loginForm" class="stack">
-      <div class="field"><label for="lgUser">الرقم الوظيفي</label><input id="lgUser" class="bigin" required inputmode="numeric" autocomplete="off" dir="ltr" placeholder="• • • • •"></div>
+      <div class="field"><label for="lgUser">الرقم السري</label><input id="lgUser" type="password" class="bigin" required inputmode="numeric" autocomplete="current-password" dir="ltr" placeholder="• • • • •"></div>
       <p class="err" id="lgErr"></p>
       <button class="btn go block" type="submit" id="lgBtn">دخول ←</button>
     </form>
@@ -452,9 +453,9 @@ body.haswbar .credit{padding-bottom:110px}
   <div class="card">
     <h2>إضافة جميع المعلمين دفعة واحدة</h2>
     <div class="stack">
-      <div class="field"><label for="bulkT">الصق القائمة هنا: كل سطر فيه الرقم الوظيفي والاسم (بأي ترتيب، مفصولين بمسافة أو فاصلة أو منسوخين من Excel)</label>
+      <div class="field"><label for="bulkT">الصق القائمة هنا: كل سطر فيه الرقم السري والاسم (بأي ترتيب، مفصولين بمسافة أو فاصلة أو منسوخين من Excel)</label>
         <textarea id="bulkT" placeholder="12345 سالم بن خميس الحارثي&#10;23456 محمد بن علي البلوشي&#10;34567 أحمد بن سعيد الهنائي"></textarea></div>
-      <div class="field"><label for="fileT">أو اختر ملف Excel فيه عمودا: الرقم الوظيفي ، الاسم</label><input type="file" id="fileT" accept=".xls,.xlsx,.csv"></div>
+      <div class="field"><label for="fileT">أو اختر ملف Excel فيه عمودا: الرقم السري ، الاسم</label><input type="file" id="fileT" accept=".xls,.xlsx,.csv"></div>
       <div class="banner" id="bulkBar" hidden><span id="bulkMsg" style="flex-basis:100%"></span><button class="btn primary small" id="bulkOk">إضافة</button><button class="btn small" id="bulkNo">إلغاء</button></div>
       <div class="row"><button class="btn primary" id="bulkCheck">مراجعة القائمة</button></div>
       <p class="hint" style="margin:0">الرقم المسجّل من قبل يُحدَّث اسمه فقط ولا يتكرر.</p>
@@ -465,9 +466,10 @@ body.haswbar .credit{padding-bottom:110px}
     <form id="tForm" class="stack" autocomplete="off">
       <div class="row">
         <div class="field" style="flex:2 1 200px"><label for="tName">الاسم</label><input id="tName" required placeholder="مثال: سالم بن خميس الحارثي"></div>
-        <div class="field"><label for="tUser">الرقم الوظيفي</label><input id="tUser" required inputmode="numeric" dir="ltr"></div>
+        <div class="field" id="tUserF"><label for="tUser">الرقم السري</label><input id="tUser" required inputmode="numeric" dir="ltr" autocomplete="off"></div>
         <div class="field"><label for="tRole">نوع الحساب</label><select id="tRole"><option value="teacher">معلم (تسجيل الغياب فقط)</option><option value="admin">مسؤول (كل الصلاحيات)</option></select></div>
       </div>
+      <p class="hint" id="tUserHint" style="margin:0" hidden></p>
       <p class="err" id="tErr" style="text-align:right"></p>
       <div class="row">
         <button class="btn primary" type="submit" id="tSubmit">إضافة</button>
@@ -484,7 +486,8 @@ body.haswbar .credit{padding-bottom:110px}
 
 <!-- ===== الطلاب ===== -->
 <div class="view" id="v-students" hidden>
-  <div class="card">
+  <div class="banner info" id="stuLocked" hidden>🔒 تعديل بيانات الطلاب غير مفعّل لحسابك. يفعّله الأستاذ أسعد الوائلي من تبويب «الإعدادات».</div>
+  <div class="card" id="stuImportCard">
     <h2>استيراد قائمة من Excel</h2>
     <div class="stack">
       <div class="field"><label for="fileStu">ملف Excel بالأعمدة: م ، الاسم ، الشعبة</label><input type="file" id="fileStu" accept=".xls,.xlsx,.csv"></div>
@@ -509,12 +512,42 @@ body.haswbar .credit{padding-bottom:110px}
       <div class="field" style="flex:1 1 90px"><label for="newStuC">الشعبة</label><input id="newStuC" placeholder="مثال: 10/1"></div>
       <button class="btn primary" type="submit">إضافة</button>
     </form>
+    <form class="banner" id="esBar" hidden style="flex-wrap:wrap;gap:8px">
+      <b id="esTitle" style="flex-basis:100%"></b>
+      <div class="field" style="flex:3 1 200px"><label for="esName">الاسم</label><input id="esName" required></div>
+      <div class="field" style="flex:1 1 90px"><label for="esC">الشعبة</label><input id="esC" required></div>
+      <div class="field" style="flex:1 1 70px"><label for="esN">م</label><input id="esN" inputmode="numeric" dir="ltr"></div>
+      <button class="btn primary small" type="submit">حفظ التعديل</button>
+      <button class="btn small" type="button" id="esCancel">إلغاء</button>
+    </form>
     <div class="list" id="stuList"></div>
+  </div>
+</div>
+
+<!-- ===== رقمي السري ===== -->
+<div class="view" id="v-mypin" hidden>
+  <div class="card center">
+    <div class="login-ic" aria-hidden="true">🔑</div>
+    <p class="logo">تغيير رقمي السري</p>
+    <p class="sub">الرقم السري هو ما تدخل به إلى الموقع. لا تشاركه مع أحد.</p>
+    <form id="pinForm" class="stack" autocomplete="off">
+      <div class="field"><label for="pinOld">الرقم السري الحالي</label><input id="pinOld" type="password" class="bigin" required inputmode="numeric" dir="ltr" autocomplete="current-password"></div>
+      <div class="field"><label for="pinNew">الرقم السري الجديد (4 أرقام على الأقل)</label><input id="pinNew" type="password" class="bigin" required inputmode="numeric" dir="ltr" autocomplete="new-password"></div>
+      <div class="field"><label for="pinNew2">أعد كتابة الرقم الجديد</label><input id="pinNew2" type="password" class="bigin" required inputmode="numeric" dir="ltr" autocomplete="new-password"></div>
+      <p class="err" id="pinErr"></p>
+      <button class="btn primary block" type="submit" id="pinBtn">حفظ الرقم الجديد</button>
+      <button class="btn block" type="button" id="pinBack">→ رجوع</button>
+    </form>
   </div>
 </div>
 
 <!-- ===== الإعدادات ===== -->
 <div class="view" id="v-settings" hidden>
+  <div class="card" id="ownerCard" hidden>
+    <h2>صلاحيات المسؤولين</h2>
+    <label style="display:flex;gap:10px;align-items:center;font-weight:700"><input type="checkbox" id="optStuEdit" style="width:20px;height:20px"> تمكين تعديل بيانات الطلاب لبقية المسؤولين</label>
+    <p class="hint" style="margin-bottom:0">عند التفعيل يستطيع المسؤولون الآخرون استيراد قوائم الطلاب وإضافة الطلاب وتعديلهم وحذفهم. أنت تستطيع ذلك دائمًا. تغيير الأرقام السرية للمعلمين يبقى لك وحدك.</p>
+  </div>
   <div class="card">
     <h2>ملف البيانات</h2>
     <p class="hint" style="margin-top:0">كل البيانات محفوظة في ملف Google Sheets خاص بك. يمكنك فتحه أو تنزيله كملف Excel من القائمة: ملف ← تنزيل.</p>
@@ -572,13 +605,14 @@ function api(fn, ...args){
   busy++; $("loading").hidden = false;
   return callServer(fn, args).catch(err => {
     const msg = String((err && err.message) || err).replace(/^(Exception|Error):\s*/, "");
-    if (msg === "SESSION"){ expired(); throw new Error("انتهت الجلسة، أدخل رقمك الوظيفي مرة أخرى"); }
+    if (msg === "SESSION"){ expired(); throw new Error("انتهت الجلسة، أدخل رقمك السري مرة أخرى"); }
     throw new Error(msg);
   }).finally(() => { if (--busy <= 0){ busy = 0; $("loading").hidden = true; } });
 }
 
 /* ---------- state ---------- */
-let TOKEN = ls.get("att.token"), ME = null, CLASSES = {};
+let TOKEN = ls.get("att.token"), ME = null, CLASSES = {}, SETTINGS = {};
+ls.set("att.user", null); // لم نعد نحفظ الرقم السري في المتصفح
 const S = { date: today(), c: null, p: null, absent: new Set(), dirty: false, day: {} };
 let view = null, teachersCache = [], STEP = 1;
 const classIds = () => Object.keys(CLASSES).sort((a,b) => (parseFloat(a) || 0) - (parseFloat(b) || 0) || a.localeCompare(b, "ar"));
@@ -586,6 +620,8 @@ const classLabel = c => /^\d+$/.test(c) ? "شعبة " + c : c;
 const hueOf = c => HUES[Math.max(0, classIds().indexOf(c)) % HUES.length];
 const studentsOf = c => CLASSES[c] || [];
 const isAdmin = () => ME && ME.role === "admin";
+const isOwner = () => ME && ME.owner;
+const canStu = () => isOwner() || (isAdmin() && SETTINGS.studentEdit);
 const first = n => norm(n).replace(/^(أ\.|أ\/|الأستاذ|استاذ|أستاذ)\s*/, "").split(" ")[0] || n;
 
 function showBar(on){ $("wbar").hidden = !on; document.body.classList.toggle("haswbar", on); }
@@ -595,11 +631,11 @@ function expired(){ TOKEN = null; ls.set("att.token", null); ME = null; showLogi
 function showLogin(){
   screen("s-login");
   $("tabs").hidden = true; $("userbar").hidden = true;
-  $("lgErr").textContent = ""; $("lgUser").value = ls.get("att.user") || "";
+  $("lgErr").textContent = ""; $("lgUser").value = "";
   setTimeout(() => $("lgUser").focus(), 50);
 }
 function enter(data){
-  ME = data.user; CLASSES = data.classes || {};
+  ME = data.user; CLASSES = data.classes || {}; SETTINGS = data.settings || {};
   $("who").textContent = ME.name + (isAdmin() ? " · مسؤول" : "");
   $("av").textContent = (first(ME.name) || "؟").charAt(0);
   $("userbar").hidden = false;
@@ -621,7 +657,7 @@ function enter(data){
   } catch(e){ $("boot").className = "banner"; $("boot").textContent = e.message; }
 })();
 
-function loggedIn(r){ TOKEN = r.token; ls.set("att.token", TOKEN); ls.set("att.user", r.user.username); enter(r); }
+function loggedIn(r){ TOKEN = r.token; ls.set("att.token", TOKEN); enter(r); }
 $("setupForm").addEventListener("submit", async e => {
   e.preventDefault(); $("suErr").textContent = "";
   try { loggedIn(await api("apiSetup", digits($("suUser").value), $("suName").value)); }
@@ -642,7 +678,7 @@ function go(v){
   document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("active", b.dataset.view === v));
   document.querySelectorAll(".view").forEach(el => el.hidden = el.id !== "v-" + v);
   showBar(false);
-  ({register: openRegister, stats: loadStats, records: openRecords, teachers: loadTeachers, students: renderStudentsAdmin, settings: openSettings})[v]();
+  ({register: openRegister, stats: loadStats, records: openRecords, teachers: loadTeachers, students: renderStudentsAdmin, settings: openSettings, mypin: openPin})[v]();
   window.scrollTo(0, 0);
 }
 $("tabs").addEventListener("click", e => { const b = e.target.closest("[data-view]"); if (b) guard(() => go(b.dataset.view)); });
@@ -656,7 +692,7 @@ $("lbStay").onclick = () => { $("leaveBar").hidden = true; pending = null; $("da
 
 const key = (c, p) => c + "|" + p;
 const cur = () => S.p ? S.day[key(S.c, S.p)] || null : null;
-const lockedForMe = r => r && !isAdmin() && r.username !== ME.username;
+const lockedForMe = r => r && !isAdmin() && r.uid !== ME.id;
 
 function setStatus(t, cls){ const s = $("status"); s.textContent = t; s.className = "status " + (cls || ""); }
 function fillSup(sel){
@@ -768,7 +804,7 @@ async function save(quiet){
     const ns = [...S.absent], list = studentsOf(S.c);
     const r = await api("apiSave", TOKEN, S.date, S.c, S.p, ns, isAdmin() ? $("sup").value : "");
     const absList = list.filter(s => S.absent.has(s.n));
-    S.day[key(S.c, S.p)] = { date:S.date, c:S.c, p:S.p, teacher:r.teacher, username:r.username, total:list.length, count:ns.length, savedAt:r.savedAt, absent: absList };
+    S.day[key(S.c, S.p)] = { date:S.date, c:S.c, p:S.p, teacher:r.teacher, uid:r.uid, total:list.length, count:ns.length, savedAt:r.savedAt, absent: absList };
     S.dirty = false;
     if (!quiet) showThanks(list.length, absList);
     return true;
@@ -999,24 +1035,37 @@ let editing = null;
 async function loadTeachers(){ try { teachersCache = await api("apiTeachers", TOKEN); renderTeachers(); } catch(e){ toast(e.message); } }
 function renderTeachers(){
   const q = norm(digits($("tSearch").value));
-  const L = teachersCache.slice().filter(t => !q || t.name.includes(q) || t.username.includes(q)).sort((a,b) => (a.role === b.role ? 0 : a.role === "admin" ? -1 : 1) || a.name.localeCompare(b.name, "ar"));
+  const L = teachersCache.slice().filter(t => !q || t.name.includes(q) || (t.username || "").includes(q)).sort((a,b) => (b.owner - a.owner) || (a.role === b.role ? 0 : a.role === "admin" ? -1 : 1) || a.name.localeCompare(b.name, "ar"));
   $("tCount").textContent = teachersCache.length;
-  $("tList").innerHTML = L.map(t => `<div class="item"><div class="grow"><div class="t1">${esc(t.name)} ${t.role === "admin" ? `<span class="pill adm">مسؤول</span>` : ""} ${t.active ? "" : `<span class="pill off">موقوف</span>`}</div><div class="t2">الرقم الوظيفي: <b dir="ltr">${esc(t.username)}</b></div></div>
-    <button class="btn small" data-edit="${esc(t.username)}">تعديل</button>
-    ${t.username === ME.username ? "" : `<button class="btn small" data-tog="${esc(t.username)}">${t.active ? "إيقاف" : "تفعيل"}</button><button class="btn small danger" data-del="${esc(t.username)}">حذف</button>`}</div>`).join("") || `<div class="empty">${q ? "لا نتائج" : "لا يوجد معلمون بعد. أضفهم من الأعلى."}</div>`;
+  $("tList").innerHTML = L.map(t => {
+    const mine = t.id === ME.id, locked = t.owner && !isOwner();
+    return `<div class="item"><div class="grow"><div class="t1">${esc(t.name)} ${t.owner ? `<span class="pill adm">المسؤول الرئيسي</span>` : t.role === "admin" ? `<span class="pill adm">مسؤول</span>` : ""} ${t.active ? "" : `<span class="pill off">موقوف</span>`}</div><div class="t2">الرقم السري: <b dir="ltr">${t.username ? esc(t.username) : "••••"}</b></div></div>
+    ${locked ? "" : `<button class="btn small" data-edit="${esc(t.id)}">تعديل</button>`}
+    ${mine || locked ? "" : `<button class="btn small" data-tog="${esc(t.id)}">${t.active ? "إيقاف" : "تفعيل"}</button><button class="btn small danger" data-del="${esc(t.id)}">حذف</button>`}</div>`;
+  }).join("") || `<div class="empty">${q ? "لا نتائج" : "لا يوجد معلمون بعد. أضفهم من الأعلى."}</div>`;
 }
 $("tSearch").addEventListener("input", renderTeachers);
-function resetTForm(){ editing = null; $("tForm").reset(); $("tErr").textContent = ""; $("tfTitle").textContent = "إضافة معلم واحد"; $("tSubmit").textContent = "إضافة"; $("tCancel").hidden = true; }
+function setTUser(mode, t){
+  // mode: "add" | "edit-owner" (المسؤول الرئيسي يعدّل رقم غيره) | "edit-none"
+  $("tUserF").hidden = mode === "edit-none"; $("tUser").required = mode === "add";
+  const h = $("tUserHint");
+  if (mode === "edit-none"){ h.hidden = false; h.textContent = t && t.id === ME.id ? "لتغيير رقمك السري استخدم زر «🔑 رقمي السري» في الأعلى." : "تغيير الرقم السري للمعلم من صلاحية الأستاذ أسعد الوائلي فقط، ويمكن للمعلم تغييره بنفسه."; }
+  else h.hidden = true;
+}
+function resetTForm(){ editing = null; $("tForm").reset(); $("tErr").textContent = ""; $("tfTitle").textContent = "إضافة معلم واحد"; $("tSubmit").textContent = "إضافة"; $("tCancel").hidden = true; setTUser("add"); }
 $("tCancel").onclick = resetTForm;
 $("tForm").addEventListener("submit", async e => {
   e.preventDefault(); $("tErr").textContent = ""; $("tSubmit").disabled = true;
   const num = digits($("tUser").value).replace(/\s+/g, ""), name = norm($("tName").value), role = $("tRole").value;
   try {
-    if (editing){ teachersCache = await api("apiUpdateTeacher", TOKEN, {username: editing, newUsername: num, name, role}); toast("تم حفظ التعديل"); }
-    else {
-      if (teachersCache.some(t => t.username === num.toLowerCase())){ $("tErr").textContent = "هذا الرقم الوظيفي مسجّل من قبل"; return; }
+    if (editing){
+      const o = {id: editing, name, role}; if (!$("tUserF").hidden && num) o.newNumber = num;
+      teachersCache = await api("apiUpdateTeacher", TOKEN, o); toast("تم حفظ التعديل");
+    } else {
+      if (teachersCache.some(t => t.username && t.username === num.toLowerCase())){ $("tErr").textContent = "هذا الرقم السري مسجّل من قبل"; return; }
       const r = await api("apiAddTeachers", TOKEN, [[num, name]], role); teachersCache = r.teachers;
-      if (r.bad.length){ $("tErr").textContent = "الرقم الوظيفي غير صحيح (أرقام فقط)"; return; }
+      if (r.bad.length){ $("tErr").textContent = "الرقم السري غير صحيح (أرقام فقط)"; return; }
+      if (!r.added && r.existing){ $("tErr").textContent = "هذا الرقم السري مسجّل من قبل"; return; }
       toast("تمت إضافة " + name);
     }
     resetTForm(); renderTeachers();
@@ -1026,8 +1075,13 @@ $("tForm").addEventListener("submit", async e => {
 let tArm = null;
 $("tList").addEventListener("click", async e => {
   const ed = e.target.closest("[data-edit]"), tg = e.target.closest("[data-tog]"), dl = e.target.closest("[data-del]");
-  if (ed){ const t = teachersCache.find(x => x.username === ed.dataset.edit); editing = t.username; $("tName").value = t.name; $("tUser").value = t.username; $("tRole").value = t.role; $("tfTitle").textContent = "تعديل: " + t.name; $("tSubmit").textContent = "حفظ التعديل"; $("tCancel").hidden = false; $("tForm").scrollIntoView({behavior:"smooth", block:"center"}); }
-  if (tg){ const t = teachersCache.find(x => x.username === tg.dataset.tog); try { teachersCache = await api("apiUpdateTeacher", TOKEN, {username: t.username, active: !t.active}); renderTeachers(); } catch(err){ toast(err.message); } }
+  if (ed){
+    const t = teachersCache.find(x => x.id === ed.dataset.edit); editing = t.id;
+    $("tName").value = t.name; $("tUser").value = t.username || ""; $("tRole").value = t.role;
+    setTUser(isOwner() && t.id !== ME.id ? "edit-owner" : "edit-none", t);
+    $("tfTitle").textContent = "تعديل: " + t.name; $("tSubmit").textContent = "حفظ التعديل"; $("tCancel").hidden = false; $("tForm").scrollIntoView({behavior:"smooth", block:"center"});
+  }
+  if (tg){ const t = teachersCache.find(x => x.id === tg.dataset.tog); try { teachersCache = await api("apiUpdateTeacher", TOKEN, {id: t.id, active: !t.active}); renderTeachers(); } catch(err){ toast(err.message); } }
   if (dl){
     if (tArm !== dl.dataset.del){ tArm = dl.dataset.del; dl.textContent = "تأكيد الحذف؟"; setTimeout(() => { if (tArm === dl.dataset.del){ tArm = null; dl.textContent = "حذف"; } }, 4000); return; }
     tArm = null; try { teachersCache = await api("apiDeleteTeacher", TOKEN, dl.dataset.del); renderTeachers(); toast("تم حذف الحساب"); } catch(err){ toast(err.message); }
@@ -1057,9 +1111,9 @@ function parseText(t){
   return out;
 }
 function previewBulk(rows){
-  if (!rows.length){ toast("لم أجد سطورًا فيها رقم وظيفي واسم"); return; }
+  if (!rows.length){ toast("لم أجد سطورًا فيها رقم سري واسم"); return; }
   const seen = new Set(); rows = rows.filter(r => !seen.has(r[0]) && seen.add(r[0]));
-  const exist = new Set(teachersCache.map(t => t.username)), nw = rows.filter(r => !exist.has(r[0])).length;
+  const exist = new Set(teachersCache.map(t => t.username).filter(Boolean)), nw = rows.filter(r => !exist.has(r[0])).length;
   BULK = rows;
   $("bulkMsg").innerHTML = `وُجد <b>${rows.length}</b> معلمًا: ${nw} جديد، ${rows.length - nw} موجود من قبل.<br><span style="font-size:13px">${rows.slice(0, 6).map(r => esc(r[1]) + " (" + r[0] + ")").join("، ")}${rows.length > 6 ? "، …" : ""}</span>`;
   $("bulkBar").hidden = false;
@@ -1079,7 +1133,7 @@ $("bulkOk").onclick = async () => {
   if (!BULK) return; $("bulkBar").hidden = true;
   try {
     const r = await api("apiAddTeachers", TOKEN, BULK, "teacher"); teachersCache = r.teachers; BULK = null; $("bulkT").value = "";
-    renderTeachers(); toast(`تمت إضافة ${r.added} معلم` + (r.updated ? ` وتحديث ${r.updated}` : "") + (r.bad.length ? ` · ${r.bad.length} سطر مرفوض` : ""));
+    renderTeachers(); toast(`تمت إضافة ${r.added} معلم` + (r.updated ? ` وتحديث ${r.updated}` : "") + (r.existing - r.updated > 0 ? ` · ${r.existing - r.updated} مسجّل من قبل` : "") + (r.bad.length ? ` · ${r.bad.length} سطر مرفوض` : ""));
   } catch(err){ toast(err.message); }
 };
 
@@ -1088,11 +1142,26 @@ function renderStudentsAdmin(){
   fillClassSel($("mClass"), false);
   if (!$("mClass").value && S.c) $("mClass").value = S.c;
   const c = $("mClass").value, L = c ? studentsOf(c) : [];
-  $("btnDelClass").hidden = !c;
+  const ed = canStu();
+  $("stuLocked").hidden = ed; $("stuImportCard").hidden = !ed; $("addStu").hidden = !ed;
+  if (!ed) $("esBar").hidden = true;
+  $("btnDelClass").hidden = !c || !ed;
   if (c && !$("newStuC").value) $("newStuC").value = c;
-  $("stuList").innerHTML = !c ? `<div class="empty">لا توجد شعب بعد. استورد ملف Excel أعلاه.</div>`
-    : L.map(s => `<div class="item"><span class="pill">${s.n}</span><div class="grow">${esc(s.name)}</div><button class="btn small danger" data-sdel="${s.n}">حذف</button></div>`).join("") || `<div class="empty">لا يوجد طلاب</div>`;
+  $("stuList").innerHTML = !c ? `<div class="empty">لا توجد شعب بعد.${ed ? " استورد ملف Excel أعلاه." : ""}</div>`
+    : L.map(s => `<div class="item"><span class="pill">${s.n}</span><div class="grow">${esc(s.name)}</div>${ed ? `<button class="btn small" data-sedit="${s.n}">تعديل</button><button class="btn small danger" data-sdel="${s.n}">حذف</button>` : ""}</div>`).join("") || `<div class="empty">لا يوجد طلاب</div>`;
 }
+let ES = null;
+$("esCancel").onclick = () => { ES = null; $("esBar").hidden = true; };
+$("esBar").addEventListener("submit", async e => {
+  e.preventDefault(); if (!ES) return;
+  const o = { name: norm($("esName").value), c: norm($("esC").value), n: digits($("esN").value).trim() };
+  try {
+    CLASSES = await api("apiUpdateStudent", TOKEN, ES.c, ES.n, o);
+    ES = null; $("esBar").hidden = true;
+    if (CLASSES[o.c]) $("mClass").value = o.c;
+    renderStudentsAdmin(); toast("تم حفظ بيانات الطالب");
+  } catch(err){ toast(err.message); }
+});
 $("mClass").addEventListener("change", () => { $("newStuC").value = $("mClass").value; renderStudentsAdmin(); });
 $("addStu").addEventListener("submit", async e => {
   e.preventDefault(); const name = norm($("newStu").value), c = norm($("newStuC").value); if (!name || !c) return;
@@ -1100,6 +1169,14 @@ $("addStu").addEventListener("submit", async e => {
 });
 let sArm = null;
 $("stuList").addEventListener("click", async e => {
+  const se = e.target.closest("[data-sedit]");
+  if (se){
+    const c = $("mClass").value, s = studentsOf(c).find(x => x.n === +se.dataset.sedit); if (!s) return;
+    ES = { c, n: s.n }; $("esTitle").textContent = "تعديل بيانات الطالب: " + s.name;
+    $("esName").value = s.name; $("esC").value = c; $("esN").value = s.n;
+    $("esBar").hidden = false; $("esBar").scrollIntoView({behavior:"smooth", block:"center"}); $("esName").focus();
+    return;
+  }
   const b = e.target.closest("[data-sdel]"); if (!b) return;
   if (sArm !== b.dataset.sdel){ sArm = b.dataset.sdel; b.textContent = "تأكيد؟"; setTimeout(() => { if (sArm === b.dataset.sdel){ sArm = null; b.textContent = "حذف"; } }, 4000); return; }
   sArm = null; try { CLASSES = await api("apiDeleteStudent", TOKEN, $("mClass").value, +b.dataset.sdel); renderStudentsAdmin(); toast("تم حذف الطالب"); } catch(err){ toast(err.message); }
@@ -1128,7 +1205,31 @@ $("impMerge").onclick = () => doImport("merge");
 $("impReplace").onclick = () => doImport("replace");
 
 /* ================= الإعدادات ================= */
-async function openSettings(){ try { $("sheetLink").href = await api("apiSheetUrl", TOKEN); } catch(e){} }
+async function openSettings(){
+  $("ownerCard").hidden = !isOwner(); $("optStuEdit").checked = !!SETTINGS.studentEdit;
+  try { $("sheetLink").href = await api("apiSheetUrl", TOKEN); } catch(e){}
+}
+$("optStuEdit").addEventListener("change", async e => {
+  const on = e.target.checked;
+  try { SETTINGS = await api("apiSetSettings", TOKEN, { studentEdit: on }); toast(on ? "تم تمكين تعديل بيانات الطلاب للمسؤولين" : "تم إيقاف تعديل بيانات الطلاب للمسؤولين"); }
+  catch(err){ e.target.checked = !on; toast(err.message); }
+});
+
+/* ================= رقمي السري ================= */
+let pinFrom = null;
+function openPin(){ $("pinForm").reset(); $("pinErr").textContent = ""; setTimeout(() => $("pinOld").focus(), 50); }
+$("btnPin").onclick = () => guard(() => { if (view !== "mypin") pinFrom = view; go("mypin"); });
+$("pinBack").onclick = () => go(pinFrom && pinFrom !== "mypin" ? pinFrom : (isAdmin() ? "stats" : "register"));
+$("pinForm").addEventListener("submit", async e => {
+  e.preventDefault(); $("pinErr").textContent = "";
+  const o = digits($("pinOld").value).replace(/\s+/g, ""), n = digits($("pinNew").value).replace(/\s+/g, ""), n2 = digits($("pinNew2").value).replace(/\s+/g, "");
+  if (!/^\d{4,20}$/.test(n)){ $("pinErr").textContent = "الرقم السري الجديد يجب أن يكون 4 أرقام على الأقل (أرقام فقط)"; return; }
+  if (n !== n2){ $("pinErr").textContent = "الرقمان الجديدان غير متطابقين"; return; }
+  $("pinBtn").disabled = true;
+  try { const r = await api("apiChangeMyNumber", TOKEN, o, n); loggedIn(r); toast("تم تغيير رقمك السري ✓ استخدم الرقم الجديد في الدخول القادم"); }
+  catch(err){ $("pinErr").textContent = err.message; }
+  finally { $("pinBtn").disabled = false; }
+});
 </script>
 </body>
 </html>
