@@ -1406,7 +1406,8 @@ function waText(v){
   const vals = Object.assign({ school: SETTINGS.school || DEF_SCHOOL }, v);
   return DEF_WA.replace(/\{(\w+)\}/g, (m, k) => vals[k] != null ? vals[k] : m);
 }
-const waHref = (phone, text) => `https://wa.me/${phone}` + (text ? `?text=${encodeURIComponent(text)}` : "");
+/* تنبيه: لا تكتب روابط http داخل قوالب النص (template literals)؛ خادم Google يعدّ الشرطتين تعليقًا ويحذف باقي السطر */
+const waHref = (phone, text) => "https://wa.me/" + phone + (text ? "?text=" + encodeURIComponent(text) : "");
 function waBtnFor(id, name, c, date, ps){
   const ph = id && IDX[id] ? IDX[id].phone : "";
   if (!isAdmin()) return "";
