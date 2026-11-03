@@ -1667,7 +1667,7 @@ function printReady(buf, wb){
 function saveBlob(data, name){
   const blob = new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
   const url = URL.createObjectURL(blob), a = document.createElement("a");
-  a.href = url; a.download = name; a.rel = "noopener"; document.body.appendChild(a); a.click(); a.remove();
+  a.href = url; a.download = name; a.rel = "noopener"; a.target = "_self"; /* صفحة Google تضيف base target=_top */ document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 function exportBook(sheets, filename){
