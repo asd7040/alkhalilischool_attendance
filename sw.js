@@ -2,7 +2,7 @@
    - الصفحة: من الشبكة أولًا (حتى تصل التحديثات فورًا)، ومن النسخة المحفوظة عند انقطاع الإنترنت.
    - الأيقونات والخطوط ومكتبة Excel: من النسخة المحفوظة أولًا.
    - طلبات الخادم (Apps Script) لا تُحفظ أبدًا. */
-const CACHE = "ghiyab-v1";
+const CACHE = "ghiyab-v3.2";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png"];
 
 self.addEventListener("install", e => {
@@ -33,7 +33,7 @@ self.addEventListener("fetch", e => {
     return;
   }
 
-  const cacheable = url.origin === location.origin || /(fonts\.googleapis\.com|fonts\.gstatic\.com|cdnjs\.cloudflare\.com)$/.test(url.hostname);
+  const cacheable = url.origin === location.origin || /(fonts\.googleapis\.com|fonts\.gstatic\.com|cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net)$/.test(url.hostname);
   if (!cacheable) return;
   e.respondWith(
     caches.match(req).then(hit => hit || fetch(req).then(res => {
