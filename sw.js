@@ -2,7 +2,7 @@
    - الصفحة: من الشبكة أولًا (حتى تصل التحديثات فورًا)، ومن النسخة المحفوظة عند انقطاع الإنترنت.
    - الأيقونات والخطوط ومكتبة Excel: من النسخة المحفوظة أولًا.
    - طلبات الخادم (Apps Script) لا تُحفظ أبدًا. */
-const CACHE = "ghiyab-v3.3";
+const CACHE = "ghiyab-v3.4";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png"];
 
 self.addEventListener("install", e => {
