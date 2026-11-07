@@ -195,6 +195,21 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 .tile .badge.lock{background:var(--muted)}
 .tile .mob{position:absolute;top:8px;inset-inline-start:8px;font-size:10.5px;font-weight:800;border-radius:999px;padding:2px 7px;background:var(--card);color:var(--brand2)}
 .tile.done{outline:2px dashed var(--ok);outline-offset:-6px}
+.tile .badge.link{background:var(--brand2)}
+.tiles .tgh{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-weight:800;font-size:15px;color:var(--muted);margin:6px 2px -2px}
+.tiles .tgh:first-child{margin-top:0}
+.tiles .tgh::after{content:"";flex:1;height:1px;background:var(--line)}
+.stu.linked{border-style:dashed}
+.stu .nm small.lk{color:var(--brand2);font-weight:700}
+.cov tr.gh td{background:var(--soft);font-weight:800;text-align:start;font-size:13px;color:var(--muted)}
+.cov td.part{background:color-mix(in srgb,var(--brand2) 14%,transparent);color:var(--brand2);font-weight:700}
+.sumdate{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap;margin-top:12px}
+.sumdate .field{flex:0 1 200px}
+.grprow .nm .chips{margin-top:6px}
+.grprow .nm .chips span{font-size:12px;padding:2px 9px}
+.chips span.mob{background:color-mix(in srgb,var(--brand2) 14%,transparent);color:var(--brand2)}
+.pdsum{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+td small.via{display:block;color:var(--brand2);font-size:11.5px;font-weight:700}
 .ptiles{grid-template-columns:repeat(4,1fr)}
 @media (max-width:420px){ .ptiles{grid-template-columns:repeat(2,1fr)} }
 
@@ -524,19 +539,41 @@ code{background:var(--soft);border-radius:6px;padding:1px 6px;font-size:13px}
   <div class="card hello">
     <h2 id="helloT"></h2>
     <p id="helloP"></p>
+    <div class="sumdate">
+      <div class="field"><label for="sumDate" data-t>ملخص يوم</label><input type="date" id="sumDate"></div>
+      <button class="btn small" id="sumPrev" type="button" data-t>اليوم السابق</button>
+      <button class="btn small" id="sumNext" type="button" data-t>اليوم التالي</button>
+      <button class="btn small primary" id="sumToday" type="button" data-t>اليوم</button>
+    </div>
   </div>
   <div class="banner" id="recAlert" hidden><i data-ic="key"></i><span class="grow" id="recAlertTxt"></span><button class="btn small primary" id="recAlertGo" data-t>عرض الطلبات</button></div>
   <div class="kpis" id="todayKpis"></div>
   <div class="card">
-    <h2><i data-ic="grid"></i><span data-t>تغطية اليوم</span> <small id="covDate"></small></h2>
+    <h2><i data-ic="grid"></i><span data-t>تغطية الحصص</span> <small id="covDate"></small></h2>
     <div class="meter"><i id="covMeter" style="width:0"></i></div>
     <p class="hint" id="covTxt" style="margin:0 0 10px"></p>
     <div class="scroll" id="coverage"></div>
     <p class="hint" data-t>✓ = سُجّلت الحصة (والرقم عدد الغائبين). اضغط على الخلية لمعرفة المعلم.</p>
+    <p class="hint" data-t>↔ = سُجّل طلاب الشعبة المتنقلة فقط، ولم تُسجَّل بقية الشعبة بعد.</p>
   </div>
   <div class="grid2">
-    <div class="card"><h2><i data-ic="userx"></i><span data-t>غائبو اليوم</span></h2><div id="todayAbs"></div></div>
-    <div class="card"><h2><i data-ic="users"></i><span data-t>المعلمون اليوم</span></h2><div id="todayT"></div></div>
+    <div class="card"><h2><i data-ic="userx"></i><span data-t>الغائبون</span> <small id="absDate"></small></h2><div id="todayAbs"></div></div>
+    <div class="card"><h2><i data-ic="users"></i><span data-t>تسجيل المعلمين</span> <small id="tDate"></small></h2><div id="todayT"></div></div>
+  </div>
+
+  <div class="card" style="margin-top:14px" id="pdCard">
+    <h2><i data-ic="list"></i><span data-t>غياب حصة محددة</span> <small id="pdDate"></small></h2>
+    <p class="hint" style="margin:0 0 10px" data-t>غياب جميع الشعب في الحصة المختارة لليوم المحدد أعلاه، مع ملف Excel منسق وجاهز للطباعة.</p>
+    <div class="row">
+      <div class="field"><label for="pdPeriod" data-t>الحصة</label><select id="pdPeriod"></select></div>
+      <div class="field"><label for="pdClass" data-t>الشعب</label><select id="pdClass"></select></div>
+    </div>
+    <div class="pdsum" id="pdSum"></div>
+    <div class="scroll" id="pdTable"></div>
+    <div class="exrow" style="margin-top:12px">
+      <button class="btn primary" id="exPd"><i data-ic="download"></i><span data-t>Excel للطباعة: هذه الحصة</span></button>
+      <button class="btn" id="exPdAll"><i data-ic="download"></i><span data-t>Excel: كل الحصص (ورقة لكل حصة)</span></button>
+    </div>
   </div>
 
   <div class="card" style="margin-top:14px">
@@ -655,6 +692,15 @@ code{background:var(--soft);border-radius:6px;padding:1px 6px;font-size:13px}
       <div class="field"><label for="mClass" data-t>اختر الشعبة</label><select id="mClass"></select></div>
     </div>
     <div class="classbar" id="classBar"></div>
+  </div>
+
+  <div class="card" id="grpCard">
+    <div class="sechead">
+      <h2><i data-ic="folder"></i><span data-t>مجموعات الشعب</span> <span class="pill" id="grpCount">0</span></h2>
+      <button class="btn small primary" id="btnNewGroup"><i data-ic="plus"></i><span data-t>مجموعة جديدة</span></button>
+    </div>
+    <p class="hint" style="margin:0 0 10px" id="grpHint"></p>
+    <div class="dlist" id="grpList"></div>
   </div>
 
   <div class="card" id="stuListCard">
@@ -937,6 +983,31 @@ const EN = {
 "رابط ملف Google Sheets غير صحيح":"Invalid Google Sheets link","هذا هو ملف البيانات الحالي":"This is already the current data file","الملف الجديد لا يحتوي على حسابك كمسؤول. فعّل «نسخ البيانات الحالية إليه»":"The new file doesn't contain your admin account. Tick “Copy current data into it”",
 "الموقع يستخدم الملف الأصلي حاليًا":"The site already uses the original file","الملف الأصلي لا يحتوي على حسابك كمسؤول. فعّل «نسخ البيانات الحالية إليه»":"The original file doesn't contain your admin account. Tick “Copy current data into it”"
 };
+/* الإصدار 4: ملخص يوم محدد، غياب حصة محددة، مجموعات الشعب، ربط الشعب المتنقلة */
+Object.assign(EN, {
+"ملخص يوم":"Summary for day","اليوم السابق":"Previous day","اليوم التالي":"Next day","تغطية الحصص":"Period coverage","تسجيل المعلمين":"Teachers' recording",
+"↔ = سُجّل طلاب الشعبة المتنقلة فقط، ولم تُسجَّل بقية الشعبة بعد.":"↔ = only the mobile-class students were recorded; the rest of the class isn't recorded yet.",
+"غياب حصة محددة":"Absences for one period","غياب جميع الشعب في الحصة المختارة لليوم المحدد أعلاه، مع ملف Excel منسق وجاهز للطباعة.":"Absences of all classes in the chosen period for the day selected above, with a formatted, print-ready Excel file.",
+"الشعب":"Classes","Excel للطباعة: هذه الحصة":"Print-ready Excel: this period","Excel: كل الحصص (ورقة لكل حصة)":"Excel: all periods (one sheet each)",
+"يوم <b>{day} {date}</b>: سُجّلت <b>{done}</b> حصة من <b>{slots}</b>، وعدد الطلاب الغائبين <b>{abs}</b> ({cases} حالة غياب).":"<b>{day} {date}</b>: <b>{done}</b> of <b>{slots}</b> periods recorded, <b>{abs}</b> students absent ({cases} absences).",
+"لم يسجّل <b>{n}</b> من {m} معلمًا.":"<b>{n}</b> of {m} teachers didn't record.","الغائبون":"Absent","نسبة الحضور":"Attendance rate","حصص مسجلة":"Recorded periods",
+"اكتمل {p}% من حصص هذا اليوم":"{p}% of this day's periods completed","لا يوجد غياب مسجّل في هذا اليوم":"No absences recorded on this day","سجّلوا ({n})":"Recorded ({n})","لم يسجّلوا ({n})":"Didn't record ({n})",
+"أعلى شعبة غيابًا <b>{c}</b> ({n} غائبين في {p}).":"Highest absence: <b>{c}</b> ({n} absent in {p}).","أعلى الشعب غيابًا <b>{c}</b> ({n} غائبين في حصة واحدة).":"Highest absence: <b>{c}</b> ({n} absent in a single period).",
+"{n} غائبين في {p}":"{n} absent in {p}","{n} غائبين في حصة واحدة":"{n} absent in one period","سُجّل طلاب {m} فقط":"Only {m} students recorded",
+"{n} غائب":"{n} absent","سُجّلت {a} من {b} شعبة":"{a} of {b} classes recorded","جزئي (متنقلة فقط): {c}":"Partial (mobile only): {c}","لم تُسجَّل: {c}":"Not recorded: {c}",
+"لا يوجد غياب مسجّل في {p}":"No absences recorded in {p}","المجموع: {n} طالب غائب · سُجّلت {a} من {b} شعبة":"Total: {n} absent · {a} of {b} classes recorded","ملاحظة":"Note","غياب الحصص":"Absences by period",
+"شعب خارج المجموعات":"Ungrouped classes","مجموعة {g}":"Group {g}","المجموعات":"Groups","{n} في شعبة متنقلة":"{n} in a mobile class","في {m}":"in {m}",
+"{n} طالب من هذه الشعبة في شعبة متنقلة هذه الحصة ({m})، وغيابهم يؤخذ من تسجيلها تلقائيًا.":"{n} students of this class are in a mobile class this period ({m}); their attendance comes from its record automatically.",
+"مجموعات الشعب":"Class groups","مجموعة جديدة":"New group","ترتيب المجموعات وشعبها يظهر في التسجيل والملخص والتقارير. اسحب المجموعة من المقبض لتغيير ترتيبها.":"Groups and their class order are used in recording, the summary and reports. Drag a group by its handle to reorder.",
+"شعب خارج المجموعات: {n}":"Ungrouped classes: {n}","جمّع الشعب الأساسية والمتنقلة في مجموعات (مثل: الصف العاشر، الصف الحادي عشر) لتظهر مرتبة في التسجيل والملخص والتقارير.":"Put regular and mobile classes into groups (e.g. Grade 10, Grade 11) so they appear organised in recording, the summary and reports.",
+"{n} شعبة":"{n} classes","لا توجد شعب في هذه المجموعة":"No classes in this group","لا توجد مجموعات بعد":"No groups yet","تم حفظ ترتيب المجموعات":"Group order saved",
+"حذف مجموعة {g}؟ الشعب نفسها وطلابها لا تُحذف.":"Delete group {g}? The classes and their students are kept.","تم حذف المجموعة":"Group deleted","تعديل مجموعة: {g}":"Edit group: {g}","حفظ المجموعة":"Save group",
+"اسم المجموعة":"Group name","مثال: الصف العاشر":"e.g. Grade 10","شعب المجموعة بالترتيب":"Classes in this group (in order)","رتّب الشعب بالسحب من المقبض أو بالأسهم.":"Reorder by dragging the handle or with the arrows.",
+"إضافة شعب إلى المجموعة":"Add classes to the group","بحث…":"Search…","إضافة الشعب الأساسية غير المجمّعة":"Add ungrouped regular classes","اكتب اسم المجموعة":"Enter the group name",
+"يوجد مجموعة أخرى بالاسم نفسه":"Another group has this name","تم حفظ المجموعة":"Group saved","تم إنشاء المجموعة":"Group created","أعلى":"Up","أسفل":"Down",
+"لم تُضف شعب بعد. اخترها من القائمة بالأسفل.":"No classes yet — pick them from the list below.","في مجموعة {g} (ستُنقل)":"in group {g} (will move)","لا توجد شعب أخرى":"No other classes",
+"اسم المجموعة طويل جدًا":"Group name is too long","عدد المجموعات كبير جدًا":"Too many groups"
+});
 const EN_RE = [
   [/^هذه الحصة سجّلها (.+)، ولا يعدّلها إلا المسؤول$/, "This period was recorded by $1; only an admin can edit it"],
   [/^الملف يحتوي على اسم شعبة متنقلة: (.+)$/, "The file contains a mobile class name: $1"],
@@ -946,7 +1017,7 @@ const EN_RE = [
 
 <script>
 "use strict";
-const VERSION = "3.0";
+const VERSION = "4.0";
 const DEF_SCHOOL = "مدرسة الإمام محمد بن عبدالله الخليلي للبنين (10-12)";
 const EN_SCHOOL = "Imam Mohammed bin Abdullah Al-Khalili School for Boys (10-12)";
 const DEF_WA = "السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب {student} المحترم\nنحيطكم علمًا بغياب ابنكم ({class}) يوم {day} {date} عن {periods}.\nنأمل متابعته، وشكرًا لتعاونكم.\n{school}";
@@ -1023,6 +1094,9 @@ const ICONS = {
   copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
   link:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
   info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
+  folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  up:'<path d="m18 15-6-6-6 6"/>',
+  down:'<path d="m6 9 6 6 6-6"/>',
   grip:'<circle cx="9" cy="6" r="1.3" fill="currentColor"/><circle cx="15" cy="6" r="1.3" fill="currentColor"/><circle cx="9" cy="12" r="1.3" fill="currentColor"/><circle cx="15" cy="12" r="1.3" fill="currentColor"/><circle cx="9" cy="18" r="1.3" fill="currentColor"/><circle cx="15" cy="18" r="1.3" fill="currentColor"/>'
 };
 const ic = (n, cls) => `<svg class="ic ${cls || ""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ""}</svg>`;
@@ -1087,11 +1161,31 @@ function api(fn, ...args){
 }
 
 /* ---------- الحالة ---------- */
-let TOKEN = ls.get("att.token"), ME = null, CLASSES = {}, CMETA = {}, SETTINGS = {}, IDX = {}, REC_N = 0;
+let TOKEN = ls.get("att.token"), ME = null, CLASSES = {}, CMETA = {}, GROUPS = [], SETTINGS = {}, IDX = {}, REC_N = 0;
 const S = { date: today(), c: null, p: null, absent: new Set(), dirty: false, day: {} };
 let view = null, teachersCache = [], STEP = 1;
 const isMobile = c => !!(CMETA[c] && CMETA[c].type === "mobile");
-const classIds = () => Object.keys(CLASSES).sort((a, b) => (isMobile(a) - isMobile(b)) || cmp(a, b));
+/* الترتيب: المجموعات بترتيبها وشعبها بترتيبها، ثم الشعب خارج المجموعات (الأساسية ثم المتنقلة) */
+function groupedIds(){
+  const seen = new Set(), out = [];
+  GROUPS.forEach(g => { const ids = g.classes.filter(c => CLASSES[c] && !seen.has(c)); ids.forEach(c => seen.add(c)); out.push({ name: g.name, ids }); });
+  const rest = Object.keys(CLASSES).filter(c => !seen.has(c)).sort((a, b) => (isMobile(a) - isMobile(b)) || cmp(a, b));
+  if (rest.length) out.push({ name: "", ids: rest });
+  return out;
+}
+const classIds = () => groupedIds().flatMap(g => g.ids);
+const groupOf = c => (GROUPS.find(g => g.classes.includes(c)) || {}).name || "";
+const grpLabel = n => n || t("شعب خارج المجموعات");
+/* مرشّح الشعب: "" = الكل، "g:اسم" = مجموعة، أو اسم شعبة */
+function classFilter(v){
+  if (!v) return () => true;
+  if (v.indexOf("g:") === 0){ const g = GROUPS.find(x => x.name === v.slice(2)), s = new Set(g ? g.classes : []); return c => s.has(c); }
+  return c => c === v;
+}
+const filterLabel = v => !v ? "" : v.indexOf("g:") === 0 ? t("مجموعة {g}", {g: v.slice(2)}) : classLabel(v);
+/* غياب لا يُكرَّر: غياب الشعبة المتنقلة المنسوب لشعبة أساسية داخل المرشّح يُحسب مرة واحدة هناك */
+const countable = (s, inC) => s.absent.filter(a => !a.mir || !inC(a.mir));
+const seatsOf = (s, inC) => s.total - (s.mh ? Object.keys(s.mh).reduce((x, h) => x + (inC(h) ? s.mh[h] : 0), 0) : 0);
 const classLabel = c => /^\d+$/.test(c) ? t("شعبة {c}", {c}) : c;
 const classLabelAr = c => /^\d+$/.test(c) ? "شعبة " + c : c;
 const hueOf = c => HUES[Math.max(0, classIds().indexOf(c)) % HUES.length];
@@ -1101,13 +1195,13 @@ const isOwner = () => !!(ME && ME.owner);
 const first = n => norm(n).replace(/^(أ\.|أ\/|الأستاذ|استاذ|أستاذ)\s*/, "").split(" ")[0] || n;
 const roleLabel = u => u.owner ? t("مسؤول رئيسي") : u.role === "admin" ? t("مسؤول") : t("معلم");
 
-function setClasses(c, m){
-  CLASSES = c || {}; if (m) CMETA = m; IDX = {};
+function setClasses(c, m, g){
+  CLASSES = c || {}; if (m) CMETA = m; if (Array.isArray(g)) GROUPS = g; IDX = {};
   const ids = Object.keys(CLASSES);
   ids.filter(k => !isMobile(k)).forEach(k => CLASSES[k].forEach(s => { if (!IDX[s.id]) IDX[s.id] = { c: k, name: s.name, phone: s.phone || "" }; }));
   ids.filter(isMobile).forEach(k => CLASSES[k].forEach(s => { if (!IDX[s.id]) IDX[s.id] = { c: s.home || k, name: s.name, phone: s.phone || "" }; }));
 }
-function applyStuRes(r){ setClasses(r.classes, r.cmeta); return r; }
+function applyStuRes(r){ setClasses(r.classes, r.cmeta, r.groups); return r; }
 function setSettings(s){ SETTINGS = s || {}; if (SETTINGS.theme) ls.set("att.schoolTheme", SETTINGS.theme); }
 
 /* ---------- المظهر ---------- */
@@ -1153,7 +1247,7 @@ function updateUserbar(){
 }
 function setRecBadge(n){ REC_N = n || 0; $("recBadge").hidden = !REC_N || !isAdmin(); $("recBadge").textContent = REC_N; }
 function enter(data, to){
-  ME = data.user; setSettings(data.settings); setClasses(data.classes, data.cmeta); REC_N = data.recCount || 0;
+  ME = data.user; setSettings(data.settings); setClasses(data.classes, data.cmeta, data.groups || []); REC_N = data.recCount || 0;
   if (ME.prefs && Object.keys(ME.prefs).length){ PREFS = Object.assign({}, PREFS, ME.prefs); ls.set("att.prefs", JSON.stringify(PREFS)); }
   applyPrefs(); updateUserbar();
   $("userbar").hidden = false; $("tabs").hidden = false;
@@ -1222,7 +1316,7 @@ function rerender(){
   if (!ME || !view) return;
   updateUserbar();
   ({ register: () => { if ($("thanks").hidden) setStep(STEP, true); },
-     stats: () => { fillStatSels(); if (STATS){ renderToday(); renderStats(); } },
+     stats: () => { fillStatSels(); if (STATS){ renderToday(); renderPd(); renderStats(); } },
      records: () => { fillClassSel($("rcClass"), false); renderRecords(); },
      teachers: () => { renderTForm(); renderTeachers(); renderRec(); },
      students: renderStudentsAdmin, settings: renderSettings })[view]();
@@ -1237,9 +1331,19 @@ $("lbDiscard").onclick = () => { $("leaveBar").hidden = true; S.dirty = false; i
 $("lbStay").onclick = () => { $("leaveBar").hidden = true; pending = null; $("date").value = S.date; };
 
 const key = (c, p) => c + "|" + p;
-const cur = () => S.p ? S.day[key(S.c, S.p)] || null : null;
+/* own: تسجيل الشعبة نفسها (وليس الحصة الجزئية الناتجة عن الشعبة المتنقلة) */
+const own = r => r && !r.auto ? r : null;
+const cur = () => S.p ? own(S.day[key(S.c, S.p)]) : null;
 const lockedForMe = r => r && !isAdmin() && r.uid !== ME.id;
 const idOfAbs = (c, a) => a.id || ((studentsOf(c).find(s => s.name === a.name) || {}).id);
+/* الطالب في شعبة متنقلة سُجّلت في هذه الحصة: يُعتمد تسجيلها له */
+function linkOf(id, p){
+  p = p || S.p; if (!p || isMobile(S.c)) return null;
+  return Object.values(S.day).find(r => r.mobile && r.p === p && r.c !== S.c && r.members && r.members.includes(id)) || null;
+}
+const linkAbs = (ms, id) => !!ms.absent.find(a => a.id === id);
+const isAbs = s => { const ms = linkOf(s.id); return ms ? linkAbs(ms, s.id) : S.absent.has(s.id); };
+const ownAbsIds = r => r ? r.absent.filter(a => !a.via).map(a => idOfAbs(S.c, a)).filter(Boolean) : [];
 
 function setStatus(x, cls){ const s = $("status"); s.textContent = x; s.className = "status " + (cls || ""); }
 function fillSup(sel){
@@ -1251,7 +1355,7 @@ function fillSup(sel){
 }
 function loadCurrent(){
   const r = cur();
-  S.absent = new Set(r ? r.absent.map(a => idOfAbs(S.c, a)).filter(Boolean) : []);
+  S.absent = new Set(ownAbsIds(r).filter(id => !linkOf(id)));
   S.dirty = false;
   if (isAdmin()) fillSup(r ? r.teacher : "");
 }
@@ -1272,39 +1376,46 @@ function ctxChips(){ return `<span>${esc(dayName(S.date))} ${S.date}</span><span
 
 function renderClasses(){
   $("date").value = S.date; $("dname").textContent = dayName(S.date) + (S.date === today() ? " (" + t("اليوم") + ")" : "");
-  const done = {}; Object.values(S.day).forEach(r => done[r.c] = (done[r.c] || 0) + 1);
-  $("classTiles").innerHTML = classIds().map(c => `<button class="tile ${c===S.c?"sel":""}" style="--h:${hueOf(c)}" data-c="${esc(c)}">${done[c] ? `<span class="badge">✓ ${done[c]}</span>` : ""}${isMobile(c) ? `<span class="mob">${esc(t("متنقلة"))}</span>` : ""}<span class="big">${esc(classLabel(c))}</span><span class="sm">${esc(t("{n} طالب", {n: studentsOf(c).length}))}</span></button>`).join("")
+  const done = {}; Object.values(S.day).forEach(r => { if (!r.auto) done[r.c] = (done[r.c] || 0) + 1; });
+  const tile = c => `<button class="tile ${c===S.c?"sel":""}" style="--h:${hueOf(c)}" data-c="${esc(c)}">${done[c] ? `<span class="badge">✓ ${done[c]}</span>` : ""}${isMobile(c) ? `<span class="mob">${esc(t("متنقلة"))}</span>` : ""}<span class="big">${esc(classLabel(c))}</span><span class="sm">${esc(t("{n} طالب", {n: studentsOf(c).length}))}</span></button>`;
+  const secs = groupedIds().filter(g => g.ids.length);
+  $("classTiles").innerHTML = (GROUPS.length ? secs.map(g => `<div class="tgh">${esc(grpLabel(g.name))}</div>` + g.ids.map(tile).join("")).join("") : classIds().map(tile).join(""))
     || `<div class="empty">${esc(isAdmin() ? t("لا توجد شعب بعد، أضفها من تبويب «الطلاب والشعب»") : t("لا توجد شعب بعد، تواصل مع إدارة المدرسة"))}</div>`;
 }
 function renderPeriods(){
   $("ctx2").innerHTML = ctxChips();
   const h = hueOf(S.c); let out = "";
   for (let p = 1; p <= NP(); p++){
-    const r = S.day[key(S.c, p)], lk = lockedForMe(r);
-    out += `<button class="tile ${p===S.p?"sel":""} ${r?"done":""}" style="--h:${(h + p * 18) % 360}" data-p="${p}">${r ? `<span class="badge ${lk?"lock":""}">${lk ? "🔒" : "✓"}</span>` : ""}<span class="sm">${esc(t("الحصة"))}</span><span class="big">${esc(pord(p))}</span>${r ? `<span class="sm">${esc(first(r.teacher))} · ${esc(t("غائب {n}", {n: r.absent.length}))}</span>` : ""}</button>`;
+    const ra = S.day[key(S.c, p)], r = own(ra), lk = lockedForMe(r);
+    const nl = isMobile(S.c) ? 0 : studentsOf(S.c).filter(s => linkOf(s.id, p)).length;
+    out += `<button class="tile ${p===S.p?"sel":""} ${r?"done":""}" style="--h:${(h + p * 18) % 360}" data-p="${p}">${r ? `<span class="badge ${lk?"lock":""}">${lk ? "🔒" : "✓"}</span>` : nl ? `<span class="badge link">↔ ${nl}</span>` : ""}<span class="sm">${esc(t("الحصة"))}</span><span class="big">${esc(pord(p))}</span>${r ? `<span class="sm">${esc(first(r.teacher))} · ${esc(t("غائب {n}", {n: r.absent.length}))}</span>` : nl ? `<span class="sm">${esc(t("{n} في شعبة متنقلة", {n: nl}))}</span>` : ""}</button>`;
   }
   $("periodTiles").innerHTML = out;
 }
 function renderRoll(){
   $("ctx3").innerHTML = ctxChips();
   const r = cur(), locked = lockedForMe(r), mob = isMobile(S.c);
-  $("lockedBar").hidden = !locked && !r;
-  $("lockedBar").textContent = locked ? "🔒 " + t("هذه الحصة سجّلها {name}. للعرض فقط.", {name: r.teacher}) : r ? "ℹ️ " + t("هذه الحصة محفوظة من قبل ({name}). أي تعديل سيحدّثها.", {name: r.teacher}) : "";
-  $("btnAllPresent").disabled = locked; $("btnCopyPrev").disabled = locked;
   const list = studentsOf(S.c), q = nk($("search").value);
+  const links = new Set(list.map(s => linkOf(s.id)).filter(Boolean).map(ms => ms.c)), nl = list.filter(s => linkOf(s.id)).length;
+  const msg = [locked ? "🔒 " + t("هذه الحصة سجّلها {name}. للعرض فقط.", {name: r.teacher}) : r ? "ℹ️ " + t("هذه الحصة محفوظة من قبل ({name}). أي تعديل سيحدّثها.", {name: r.teacher}) : "",
+    nl ? "↔ " + t("{n} طالب من هذه الشعبة في شعبة متنقلة هذه الحصة ({m})، وغيابهم يؤخذ من تسجيلها تلقائيًا.", {n: nl, m: [...links].map(classLabel).join("، ")}) : ""].filter(Boolean);
+  $("lockedBar").hidden = !msg.length;
+  $("lockedBar").textContent = msg.join("\n");
+  $("lockedBar").style.whiteSpace = "pre-line";
+  $("btnAllPresent").disabled = locked; $("btnCopyPrev").disabled = locked;
   const shown = q ? list.filter(s => nk(s.name).includes(q)) : list;
-  $("students").innerHTML = shown.length ? shown.map(s => { const a = S.absent.has(s.id);
-    return `<button class="stu ${a?"absent":""}" data-id="${esc(s.id)}" aria-pressed="${a}" ${locked?"disabled":""}><span class="num">${s.n}</span><span class="nm">${esc(s.name)}${mob && s.home ? `<small>${esc(classLabel(s.home))}</small>` : ""}</span><span class="tag">${esc(a ? t("غائب") : t("حاضر"))}</span></button>`; }).join("")
+  $("students").innerHTML = shown.length ? shown.map(s => { const ms = linkOf(s.id), a = isAbs(s);
+    return `<button class="stu ${a?"absent":""} ${ms?"linked":""}" data-id="${esc(s.id)}" aria-pressed="${a}" ${locked || ms ?"disabled":""}><span class="num">${s.n}</span><span class="nm">${esc(s.name)}${mob && s.home ? `<small>${esc(classLabel(s.home))}</small>` : ""}${ms ? `<small class="lk">↔ ${esc(t("في {m}", {m: classLabel(ms.c)}))}</small>` : ""}</span><span class="tag">${esc(a ? t("غائب") : t("حاضر"))}</span></button>`; }).join("")
     : `<div class="empty">${esc(q ? t("لا يوجد طالب بهذا الاسم") : t("لا يوجد طلاب في هذه الشعبة"))}</div>`;
   updateCounts();
 }
 function updateCounts(){
-  const list = studentsOf(S.c), abs = list.filter(s => S.absent.has(s.id)).length;
+  const list = studentsOf(S.c), abs = list.filter(isAbs).length;
   $("cPresent").textContent = list.length - abs; $("cAbsent").textContent = abs;
   return {total: list.length, abs};
 }
 function renderReview(){
-  const {total, abs} = updateCounts(), r = cur(), names = studentsOf(S.c).filter(s => S.absent.has(s.id));
+  const {total, abs} = updateCounts(), r = cur(), names = studentsOf(S.c).filter(isAbs);
   $("rvMeta").innerHTML = `<dt>${esc(t("التاريخ"))}</dt><dd>${esc(dayName(S.date))} ${S.date}</dd><dt>${esc(t("الشعبة"))}</dt><dd>${esc(classLabel(S.c))}</dd><dt>${esc(t("الحصة"))}</dt><dd>${esc(pname(S.p))}</dd>` + (isAdmin() ? "" : `<dt>${esc(t("المعلم"))}</dt><dd>${esc(ME.name)}</dd>`);
   $("rvP").textContent = total - abs; $("rvA").textContent = abs;
   $("rvList").innerHTML = abs ? `<div class="lbl" style="margin-bottom:6px">${esc(t("الطلاب الغائبون:"))}</div><div class="rvlist">${names.map(s => `<span>${s.n}. ${esc(s.name)}</span>`).join("")}</div>` : `<div class="allp">👏 ${esc(t("جميع الطلاب حاضرون"))}</div>`;
@@ -1351,12 +1462,13 @@ async function save(quiet){
   if (saving || !S.c || !S.p || lockedForMe(cur())) return false;
   saving = true; $("wNext").disabled = true;
   try {
-    const list = studentsOf(S.c), ids = list.filter(s => S.absent.has(s.id)).map(s => s.id);
+    const list = studentsOf(S.c), ids = list.filter(s => S.absent.has(s.id) && !linkOf(s.id)).map(s => s.id);
     const r = await api("apiSave", TOKEN, S.date, S.c, S.p, ids, isAdmin() ? $("sup").value : "");
-    const absList = list.filter(s => S.absent.has(s.id)).map(s => ({n: s.n, name: s.name, id: s.id, home: s.home || ""}));
-    S.day[key(S.c, S.p)] = { date:S.date, c:S.c, p:S.p, teacher:r.teacher, uid:r.uid, total:list.length, count:ids.length, savedAt:r.savedAt, absent: absList };
+    const absList = list.filter(isAbs).map(s => { const ms = linkOf(s.id); return {n: s.n, name: s.name, id: s.id, home: s.home || "", via: ms ? ms.c : undefined}; });
+    S.day[key(S.c, S.p)] = Object.assign({}, S.day[key(S.c, S.p)] || {}, { date:S.date, c:S.c, p:S.p, teacher:r.teacher, uid:r.uid, total:list.length, count:absList.length, savedAt:r.savedAt, absent: absList, auto: false }, isMobile(S.c) ? { mobile: true, members: list.map(s => s.id) } : {});
     S.dirty = false;
     if (!quiet) showThanks(list.length, absList);
+    if (isMobile(S.c)) loadDay();
     return true;
   } catch(e){ toast(e.message); setStatus(t("لم يُحفظ"), "dirty"); return false; }
   finally { saving = false; if (view === "register" && $("thanks").hidden) renderBar(); }
@@ -1391,7 +1503,7 @@ $("students").addEventListener("click", e => {
 $("search").addEventListener("input", renderRoll);
 $("sup").addEventListener("change", () => { S.dirty = true; });
 $("btnAllPresent").onclick = () => { S.absent.clear(); markDirty(); renderRoll(); toast(t("تم تحديد الجميع حاضرين")); };
-$("btnCopyPrev").onclick = () => { for (let p = S.p - 1; p >= 1; p--){ const r = S.day[key(S.c, p)]; if (r){ S.absent = new Set(r.absent.map(a => idOfAbs(S.c, a)).filter(Boolean)); markDirty(); renderRoll(); toast(t("تم نسخ غياب {p}", {p: pname(p)})); return; } } toast(t("لا توجد حصة سابقة مسجلة لهذه الشعبة اليوم")); };
+$("btnCopyPrev").onclick = () => { for (let p = S.p - 1; p >= 1; p--){ const r = own(S.day[key(S.c, p)]); if (r){ S.absent = new Set(ownAbsIds(r).filter(id => !linkOf(id))); markDirty(); renderRoll(); toast(t("تم نسخ غياب {p}", {p: pname(p)})); return; } } toast(t("لا توجد حصة سابقة مسجلة لهذه الشعبة اليوم")); };
 document.addEventListener("visibilitychange", () => { if (!document.hidden && view === "register" && ME && !S.dirty && $("thanks").hidden) loadDay(); });
 window.addEventListener("beforeunload", e => { if (S.dirty){ e.preventDefault(); e.returnValue = ""; } });
 
@@ -1418,13 +1530,29 @@ function waBtnFor(id, name, c, date, ps){
 }
 
 /* ================= الملخص والإحصائيات ================= */
-let STATS = null;
-function fillClassSel(sel, all){ const v = sel.value; sel.innerHTML = (all ? `<option value="">${esc(t("كل الشعب"))}</option>` : "") + classIds().map(c => `<option value="${esc(c)}">${esc(classLabel(c))}</option>`).join(""); if ([...sel.options].some(o => o.value === v)) sel.value = v; }
+let STATS = null, SUMD = today();
+/* خيارات الشعب مقسمة حسب المجموعات */
+function classOptions(filter, lab){
+  filter = filter || (() => true); lab = lab || classLabel;
+  const one = c => `<option value="${esc(c)}">${esc(lab(c))}</option>`;
+  if (!GROUPS.length) return classIds().filter(filter).map(one).join("");
+  return groupedIds().map(g => { const ids = g.ids.filter(filter); return ids.length ? `<optgroup label="${esc(grpLabel(g.name))}">${ids.map(one).join("")}</optgroup>` : ""; }).join("");
+}
+function fillClassSel(sel, all, grp){
+  const v = sel.value;
+  sel.innerHTML = (all ? `<option value="">${esc(t("كل الشعب"))}</option>` : "")
+    + (grp && GROUPS.length ? `<optgroup label="${esc(t("المجموعات"))}">${GROUPS.map(g => `<option value="g:${esc(g.name)}">${esc(t("مجموعة {g}", {g: g.name}))}</option>`).join("")}</optgroup>` : "")
+    + classOptions();
+  if ([...sel.options].some(o => o.value === v)) sel.value = v;
+}
 function fillStatSels(){
-  fillClassSel($("stClass"), true);
+  fillClassSel($("stClass"), true, true); fillClassSel($("pdClass"), true, true);
+  const opts = Array.from({length: NP()}, (_, i) => `<option value="${i+1}">${esc(pname(i+1))}</option>`).join("");
   const sp = $("stPeriod"), v = sp.value;
-  sp.innerHTML = `<option value="">${esc(t("كل الحصص"))}</option>` + Array.from({length: NP()}, (_, i) => `<option value="${i+1}">${esc(pname(i+1))}</option>`).join("");
+  sp.innerHTML = `<option value="">${esc(t("كل الحصص"))}</option>` + opts;
   if ([...sp.options].some(o => o.value === v)) sp.value = v;
+  const pp = $("pdPeriod"), w = pp.value || ls.get("att.pdP") || "1";
+  pp.innerHTML = opts; pp.value = [...pp.options].some(o => o.value === w) ? w : "1";
 }
 function rangeDates(){
   const d = today(), r = $("stRange").value;
@@ -1443,65 +1571,135 @@ $("recAlertGo").onclick = () => go("teachers");
 
 async function loadStats(){
   fillStatSels();
-  const [from, to] = rangeDates(), d = today();
+  const [from, to] = rangeDates(), d = SUMD;
   try {
     const [st, tod] = await Promise.all([api("apiStats", TOKEN, from, to), api("apiDay", TOKEN, d)]);
-    setClasses(st.classes, st.cmeta); teachersCache = st.teachers; setRecBadge(st.recCount); fillStatSels();
-    STATS = { from, to, sessions: st.sessions, today: tod };
-    renderToday(); renderStats();
+    setClasses(st.classes, st.cmeta, st.groups); teachersCache = st.teachers; setRecBadge(st.recCount); fillStatSels();
+    STATS = { from, to, sessions: st.sessions, today: tod, dayDate: d };
+    renderToday(); renderPd(); renderStats();
   } catch(e){ toast(e.message); }
 }
+/* ملخص يوم يختاره المسؤول */
+async function loadSum(d){
+  SUMD = d || today(); $("sumDate").value = SUMD;
+  if (!STATS){ loadStats(); return; }
+  try { const tod = await api("apiDay", TOKEN, SUMD); if (d && SUMD !== d) return; STATS.today = tod; STATS.dayDate = SUMD; renderToday(); renderPd(); }
+  catch(e){ toast(e.message); }
+}
+/* اليوم الدراسي السابق/التالي (يتخطى الجمعة والسبت) */
+const schoolDay = (d, dir) => { let x = addDays(d, dir); for (let i = 0; i < 3 && [5, 6].includes(new Date(x + "T12:00").getDay()); i++) x = addDays(x, dir); return x; };
+$("sumDate").addEventListener("change", e => loadSum(e.target.value || today()));
+$("sumPrev").onclick = () => loadSum(schoolDay(SUMD, -1));
+$("sumNext").onclick = () => loadSum(schoolDay(SUMD, 1));
+$("sumToday").onclick = () => loadSum(today());
 const kpiHtml = items => items.map(([k, v, s, h]) => `<div class="kpi" style="--h:${h}"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div><div class="s">${esc(s)}</div></div>`).join("");
 const akey = (s, a) => a.id || (s.c + "|" + a.name);
 
+/* أعلى شعبة غيابًا: أكبر عدد غائبين في حصة واحدة (وليس مجموع الحصص) */
+function topClasses(list){
+  const best = {}, sum = {};
+  list.forEach(s => { const v = s.absent.length; sum[s.c] = (sum[s.c] || 0) + v; if (!best[s.c] || v > best[s.c].v || (v === best[s.c].v && s.p < best[s.c].p)) best[s.c] = {v, p: s.p}; });
+  const mx = Math.max(0, ...Object.values(best).map(b => b.v));
+  const tops = mx ? classIds().filter(c => best[c] && best[c].v === mx).sort((a, b) => sum[b] - sum[a]) : [];
+  return { mx, tops, best };
+}
 function renderToday(){
-  const d = today(), tod = STATS.today, ids = classIds(), n = NP();
+  const d = STATS.dayDate || today(), isT = d === today(), all = STATS.today, ids = classIds(), n = NP(), any = () => true;
+  const tod = all.filter(s => !s.auto);
   const slots = ids.length * n, done = tod.length;
-  const absCases = tod.reduce((a, s) => a + s.absent.length, 0), seats = tod.reduce((a, s) => a + s.total, 0);
+  const absCases = all.reduce((a, s) => a + countable(s, any).length, 0), seats = all.reduce((a, s) => a + seatsOf(s, any), 0);
   const stu = new Map();
-  tod.forEach(s => s.absent.forEach(a => { const k = akey(s, a); if (!stu.has(k)) stu.set(k, {c: s.c, id: a.id, name: a.name, ps: []}); stu.get(k).ps.push(s.p); }));
-  const byC = {}; tod.forEach(s => byC[s.c] = (byC[s.c] || 0) + s.absent.length);
-  const topC = Object.entries(byC).sort((a,b) => b[1] - a[1])[0];
+  all.forEach(s => countable(s, any).forEach(a => { const k = akey(s, a); if (!stu.has(k)) stu.set(k, {c: s.c, id: a.id, name: a.name, ps: [], via: new Set()}); const m = stu.get(k); m.ps.push(s.p); if (a.via) m.via.add(a.via); }));
+  const {mx, tops, best} = topClasses(all);
+  const topNames = tops.slice(0, 3).map(classLabel).join("، ") + (tops.length > 3 ? "…" : "");
   const tDone = new Map(); tod.forEach(s => tDone.set(s.teacher, (tDone.get(s.teacher) || 0) + 1));
   const actives = teachersCache.filter(x => x.active), notYet = actives.filter(x => !tDone.has(x.name));
-  const h = new Date().getHours();
+  const h = new Date().getHours(), dd = `${dayName(d)} ${d}`;
+  $("sumDate").value = d; $("sumToday").hidden = isT; $("sumNext").disabled = d >= today();
   $("helloT").textContent = t(h < 12 ? "صباح الخير أستاذ {name} 👋" : "مساء الخير أستاذ {name} 👋", {name: first(ME.name)});
-  $("helloP").innerHTML = t("اليوم <b>{day} {date}</b>: سُجّلت <b>{done}</b> حصة من <b>{slots}</b>، وعدد الطلاب الغائبين <b>{abs}</b> ({cases} حالة غياب).", {day: esc(dayName(d)), date: d, done, slots, abs: stu.size, cases: absCases})
-    + (topC && topC[1] ? " " + t("أعلى شعبة غيابًا <b>{c}</b> ({n}).", {c: esc(classLabel(topC[0])), n: topC[1]}) : "")
-    + (notYet.length && actives.length ? " " + t("لم يسجّل بعد <b>{n}</b> من {m} معلمًا.", {n: notYet.length, m: actives.length}) : "");
+  $("helloP").innerHTML = t(isT ? "اليوم <b>{day} {date}</b>: سُجّلت <b>{done}</b> حصة من <b>{slots}</b>، وعدد الطلاب الغائبين <b>{abs}</b> ({cases} حالة غياب)." : "يوم <b>{day} {date}</b>: سُجّلت <b>{done}</b> حصة من <b>{slots}</b>، وعدد الطلاب الغائبين <b>{abs}</b> ({cases} حالة غياب).", {day: esc(dayName(d)), date: d, done, slots, abs: stu.size, cases: absCases})
+    + (tops.length === 1 ? " " + t("أعلى شعبة غيابًا <b>{c}</b> ({n} غائبين في {p}).", {c: esc(classLabel(tops[0])), n: mx, p: esc(pname(best[tops[0]].p))}) : tops.length ? " " + t("أعلى الشعب غيابًا <b>{c}</b> ({n} غائبين في حصة واحدة).", {c: esc(topNames), n: mx}) : "")
+    + (notYet.length && actives.length ? " " + t(isT ? "لم يسجّل بعد <b>{n}</b> من {m} معلمًا." : "لم يسجّل <b>{n}</b> من {m} معلمًا.", {n: notYet.length, m: actives.length}) : "");
   $("recAlert").hidden = !REC_N;
   $("recAlertTxt").textContent = t("يوجد {n} طلب لاسترجاع الرقم السري بانتظار الرد.", {n: REC_N});
   $("todayKpis").innerHTML = kpiHtml([
-    [t("غائبون اليوم"), stu.size, t("طالب مختلف"), 0],
-    [t("نسبة الحضور اليوم"), (seats ? (100 - pct(absCases, seats)) : 100) + "%", t("من الحصص المسجلة"), 140],
-    [t("حصص مسجلة اليوم"), `${done}/${slots}`, t("{p}% من الجدول", {p: pct(done, slots)}), 220],
+    [t(isT ? "غائبون اليوم" : "الغائبون"), stu.size, t("طالب مختلف"), 0],
+    [t(isT ? "نسبة الحضور اليوم" : "نسبة الحضور"), (seats ? (100 - pct(absCases, seats)) : 100) + "%", t("من الحصص المسجلة"), 140],
+    [t(isT ? "حصص مسجلة اليوم" : "حصص مسجلة"), `${done}/${slots}`, t("{p}% من الجدول", {p: pct(done, slots)}), 220],
     [t("معلمون سجّلوا"), tDone.size, t("من {n} معلم نشط", {n: actives.length}), 262],
-    [t("أعلى شعبة غيابًا"), topC && topC[1] ? classLabel(topC[0]) : "—", topC && topC[1] ? t("{n} حالة", {n: topC[1]}) : t("لا يوجد غياب"), 24],
+    [t("أعلى شعبة غيابًا"), tops.length ? topNames : "—", tops.length === 1 ? t("{n} غائبين في {p}", {n: mx, p: pname(best[tops[0]].p)}) : tops.length ? t("{n} غائبين في حصة واحدة", {n: mx}) : t("لا يوجد غياب"), 24],
     [t("متوسط الغياب للحصة"), done ? (absCases / done).toFixed(1) : "0", t("طالب في كل حصة"), 195]
   ]);
-  $("covDate").textContent = `${dayName(d)} ${d}`;
+  $("covDate").textContent = dd; $("absDate").textContent = dd; $("tDate").textContent = dd;
   $("covMeter").style.width = pct(done, slots) + "%";
-  $("covTxt").textContent = t("اكتمل {p}% من حصص اليوم", {p: pct(done, slots)});
-  const tmap = {}; tod.forEach(s => tmap[s.c + "|" + s.p] = s);
+  $("covTxt").textContent = t(isT ? "اكتمل {p}% من حصص اليوم" : "اكتمل {p}% من حصص هذا اليوم", {p: pct(done, slots)});
+  const tmap = {}; all.forEach(s => tmap[s.c + "|" + s.p] = s);
+  const lk = s => s.links && s.links.length ? " · ↔ " + s.links.map(classLabel).join("، ") : "";
   let x = `<table class="cov"><thead><tr><th>${esc(t("الشعبة"))}</th>`; for (let p = 1; p <= n; p++) x += `<th>${pshort(p)}</th>`; x += `<th>${esc(t("المسجّل"))}</th></tr></thead><tbody>`;
-  ids.forEach(c => { let dn = 0; x += `<tr><td class="name">${esc(classLabel(c))}</td>`;
-    for (let p = 1; p <= n; p++){ const s = tmap[c + "|" + p]; if (s){ dn++; x += `<td class="ok" data-tip="${esc(`${pname(p)} · ${s.teacher} · ${t("غائب {n}", {n: s.absent.length})}`)}">✓ ${s.absent.length}</td>`; } else x += `<td class="no">—</td>`; }
-    x += `<td>${dn}/${n}</td></tr>`; });
+  const row = c => { let dn = 0, r = `<tr><td class="name">${esc(classLabel(c))}</td>`;
+    for (let p = 1; p <= n; p++){ const s = tmap[c + "|" + p];
+      if (s && !s.auto){ dn++; r += `<td class="ok" data-tip="${esc(`${pname(p)} · ${s.teacher} · ${t("غائب {n}", {n: s.absent.length})}${lk(s)}`)}">✓ ${s.absent.length}</td>`; }
+      else if (s) r += `<td class="part" data-tip="${esc(`${pname(p)} · ${t("سُجّل طلاب {m} فقط", {m: s.links.map(classLabel).join("، ")})} · ${t("غائب {n}", {n: s.absent.length})}`)}">↔ ${s.absent.length}</td>`;
+      else r += `<td class="no">—</td>`; }
+    return r + `<td>${dn}/${n}</td></tr>`; };
+  x += GROUPS.length ? groupedIds().filter(g => g.ids.length).map(g => `<tr class="gh"><td colspan="${n + 2}">${esc(grpLabel(g.name))}</td></tr>` + g.ids.map(row).join("")).join("") : ids.map(row).join("");
   $("coverage").innerHTML = ids.length ? x + "</tbody></table>" : `<div class="empty">${esc(t("لا توجد شعب بعد"))}</div>`;
   const g = {}; [...stu.values()].forEach(m => (g[m.c] = g[m.c] || []).push(m));
-  $("todayAbs").innerHTML = Object.keys(g).length ? ids.filter(c => g[c]).map(c => `<div class="absgrp"><b>${esc(classLabel(c))} <span class="pill">${g[c].length}</span></b>${g[c].sort((a,b) => cmp(a.name, b.name)).map(m => { const ps = [...new Set(m.ps)].sort((a,b)=>a-b); return `<div class="arow"><div class="grow">${esc(m.name)}<small>${esc(ps.length >= n ? t("اليوم كامل") : ps.map(pshort).join("، "))}</small></div>${waBtnFor(m.id, m.name, c, d, ps)}</div>`; }).join("")}</div>`).join("") : `<div class="allp">👏 ${esc(t("لا يوجد غياب مسجّل اليوم"))}</div>`;
-  $("todayT").innerHTML = `<div class="lbl" style="margin-bottom:6px">${esc(t("سجّلوا اليوم ({n})", {n: tDone.size}))}</div><div class="chips" style="margin-bottom:12px">${[...tDone.entries()].sort((a,b) => b[1] - a[1]).map(([nm, k]) => `<span class="ok">${esc(nm)} · ${k}</span>`).join("") || `<span>${esc(t("لا أحد بعد"))}</span>`}</div>` +
-    `<div class="lbl" style="margin-bottom:6px">${esc(t("لم يسجّلوا بعد ({n})", {n: notYet.length}))}</div><div class="chips">${notYet.map(y => `<span class="no">${esc(y.name)}</span>`).join("") || `<span class="ok">${esc(t("الجميع سجّل 🎉"))}</span>`}</div>`;
+  $("todayAbs").innerHTML = Object.keys(g).length ? ids.filter(c => g[c]).map(c => `<div class="absgrp"><b>${esc(classLabel(c))} <span class="pill">${g[c].length}</span></b>${g[c].sort((a,b) => cmp(a.name, b.name)).map(m => { const ps = [...new Set(m.ps)].sort((a,b)=>a-b); return `<div class="arow"><div class="grow">${esc(m.name)}<small>${esc((ps.length >= n ? t("اليوم كامل") : ps.map(pshort).join("، ")) + (m.via.size ? " · ↔ " + [...m.via].map(classLabel).join("، ") : ""))}</small></div>${waBtnFor(m.id, m.name, c, d, ps)}</div>`; }).join("")}</div>`).join("") : `<div class="allp">👏 ${esc(t(isT ? "لا يوجد غياب مسجّل اليوم" : "لا يوجد غياب مسجّل في هذا اليوم"))}</div>`;
+  $("todayT").innerHTML = `<div class="lbl" style="margin-bottom:6px">${esc(t(isT ? "سجّلوا اليوم ({n})" : "سجّلوا ({n})", {n: tDone.size}))}</div><div class="chips" style="margin-bottom:12px">${[...tDone.entries()].sort((a,b) => b[1] - a[1]).map(([nm, k]) => `<span class="ok">${esc(nm)} · ${k}</span>`).join("") || `<span>${esc(t("لا أحد بعد"))}</span>`}</div>` +
+    `<div class="lbl" style="margin-bottom:6px">${esc(t(isT ? "لم يسجّلوا بعد ({n})" : "لم يسجّلوا ({n})", {n: notYet.length}))}</div><div class="chips">${notYet.map(y => `<span class="no">${esc(y.name)}</span>`).join("") || `<span class="ok">${esc(t("الجميع سجّل 🎉"))}</span>`}</div>`;
 }
-function statFilter(){ const cf = $("stClass").value, pf = +$("stPeriod").value || 0; return {cf, pf, ses: STATS.sessions.filter(s => (!cf || s.c === cf) && (!pf || s.p === pf))}; }
+
+/* ================= غياب حصة محددة (لليوم المختار في الملخص) ================= */
+function pdData(p, f){
+  const d = STATS.dayDate || today(), inC = classFilter(f), all = STATS.today.filter(s => s.p === p);
+  const by = {}; all.forEach(s => by[s.c] = s);
+  const rows = [], notRec = [], part = [];
+  let recorded = 0, normal = 0;
+  classIds().filter(inC).forEach(c => {
+    const s = by[c], mob = isMobile(c);
+    if (!mob){ normal++; if (s && !s.auto) recorded++; else if (s) part.push(c); else notRec.push(c); }
+    if (!s) return;
+    const L = mob ? countable(s, inC) : s.absent;
+    L.slice().sort((a, b) => (a.n || 0) - (b.n || 0)).forEach(a => rows.push({ c, n: a.n, name: a.name, id: a.id, via: a.via || "", mobHome: mob ? (a.home || "") : "", teacher: s.teacher }));
+  });
+  return { d, p, f, rows, notRec, part, recorded, normal };
+}
+function renderPd(){
+  if (!STATS) return;
+  const p = +$("pdPeriod").value || 1, D = pdData(p, $("pdClass").value), wa = isAdmin();
+  $("pdDate").textContent = `${dayName(D.d)} ${D.d}`;
+  $("pdSum").innerHTML = `<span class="pill ${D.rows.length ? "off" : "ok"}">${esc(t("{n} غائب", {n: D.rows.length}))}</span><span class="pill">${esc(t("سُجّلت {a} من {b} شعبة", {a: D.recorded, b: D.normal}))}</span>`
+    + (D.part.length ? `<span class="pill mob">${esc(t("جزئي (متنقلة فقط): {c}", {c: D.part.map(classLabel).join("، ")}))}</span>` : "")
+    + (D.notRec.length ? `<span class="pill adm">${esc(t("لم تُسجَّل: {c}", {c: D.notRec.map(classLabel).join("، ")}))}</span>` : "");
+  $("pdTable").innerHTML = D.rows.length ? `<table><thead><tr><th>#</th><th>${esc(t("الشعبة"))}</th><th>${esc(t("م"))}</th><th>${esc(t("اسم الطالب"))}</th><th>${esc(t("المعلم المشرف"))}</th>${wa ? `<th>${esc(t("ولي الأمر"))}</th>` : ""}</tr></thead><tbody>`
+    + D.rows.map((r, i) => `<tr><td>${i + 1}</td><td>${esc(classLabel(r.c))}${r.via ? `<small class="via">↔ ${esc(classLabel(r.via))}</small>` : r.mobHome ? `<small class="via">${esc(classLabel(r.mobHome))}</small>` : ""}</td><td>${r.n || ""}</td><td class="name">${esc(r.name)}</td><td>${esc(r.teacher)}</td>${wa ? `<td>${waBtnFor(r.id, r.name, r.c, D.d, [p])}</td>` : ""}</tr>`).join("") + `</tbody></table>`
+    : `<div class="allp">👏 ${esc(t("لا يوجد غياب مسجّل في {p}", {p: pname(p)}))}</div>`;
+}
+function pdSheet(p, f){
+  const D = pdData(p, f), fl = filterLabel(f);
+  const rows = D.rows.map((r, i) => [i + 1, classLabel(r.c), r.n || "", r.name, r.via ? t("في {m}", {m: classLabel(r.via)}) : r.mobHome ? classLabel(r.mobHome) : "", r.teacher]);
+  const foot = [t("المجموع: {n} طالب غائب · سُجّلت {a} من {b} شعبة", {n: D.rows.length, a: D.recorded, b: D.normal})
+    + (D.notRec.length ? " · " + t("لم تُسجَّل: {c}", {c: D.notRec.map(classLabel).join("، ")}) : "")
+    + (D.part.length ? " · " + t("جزئي (متنقلة فقط): {c}", {c: D.part.map(classLabel).join("، ")}) : "")];
+  return { name: pname(p), title: schoolName(), sub: `${t("غياب")} ${pname(p)} — ${dayName(D.d)} ${D.d}${fl ? " — " + fl : ""}`,
+    head: ["#", t("الشعبة"), t("م"), t("اسم الطالب"), t("ملاحظة"), t("المعلم المشرف")], rows, foot, footMerge: true, footH: 34,
+    cols: [5, 13, 5, 34, 16, 24], left: [3, 5], bodyH: 21, bodySz: 11, onePage: rows.length <= 38 };
+}
+$("pdPeriod").addEventListener("change", () => { ls.set("att.pdP", $("pdPeriod").value); renderPd(); });
+$("pdClass").addEventListener("change", renderPd);
+$("exPd").onclick = () => { if (!STATS) return; const p = +$("pdPeriod").value || 1, f = $("pdClass").value; exportBook([pdSheet(p, f)], `${t("غياب")} ${pname(p)} ${STATS.dayDate}`); };
+$("exPdAll").onclick = () => { if (!STATS) return; const f = $("pdClass").value; exportBook(Array.from({length: NP()}, (_, i) => pdSheet(i + 1, f)), `${t("غياب الحصص")} ${STATS.dayDate}`); };
+
+function statFilter(){ const cf = $("stClass").value, pf = +$("stPeriod").value || 0, inC = classFilter(cf); return {cf, pf, inC, ses: STATS.sessions.filter(s => inC(s.c) && (!pf || s.p === pf))}; }
 function renderStats(){
   if (!STATS) return;
-  const {cf, pf, ses} = statFilter(), n = NP();
-  const sesC = STATS.sessions.filter(s => !cf || s.c === cf);
-  const absTotal = ses.reduce((a, s) => a + s.absent.length, 0);
-  const seats = ses.reduce((a, s) => a + s.total, 0);
+  const {cf, pf, inC, ses} = statFilter(), n = NP();
+  const sesC = STATS.sessions.filter(s => inC(s.c));
+  const absTotal = ses.reduce((a, s) => a + countable(s, inC).length, 0);
+  const seats = ses.reduce((a, s) => a + seatsOf(s, inC), 0);
   const stuMap = new Map();
-  ses.forEach(s => s.absent.forEach(a => { const k = akey(s, a); if (!stuMap.has(k)) stuMap.set(k, {key: k, c: s.c, id: a.id, name: a.name, periods: 0, days: new Set(), list: []}); const m = stuMap.get(k); m.periods++; m.days.add(s.date); m.list.push(s); }));
+  ses.forEach(s => countable(s, inC).forEach(a => { const k = akey(s, a); if (!stuMap.has(k)) stuMap.set(k, {key: k, c: s.c, id: a.id, name: a.name, periods: 0, days: new Set(), list: []}); const m = stuMap.get(k); m.periods++; m.days.add(s.date); m.list.push(a.via ? Object.assign({}, s, {via: a.via}) : s); }));
   const days = new Set(ses.map(s => s.date));
   const fullDay = [...stuMap.values()].filter(m => { const pd = {}; m.list.forEach(s => pd[s.date] = (pd[s.date] || 0) + 1); return Object.values(pd).some(v => v >= n); }).length;
   $("kpis").innerHTML = kpiHtml([
@@ -1509,21 +1707,21 @@ function renderStats(){
     [t("نسبة الغياب"), pct(absTotal, seats) + "%", t("من مقاعد الحصص المسجلة"), 24],
     [t("طلاب غابوا"), stuMap.size, t("طالب مختلف على الأقل مرة"), 330],
     [t("غياب يوم كامل"), pf ? "—" : fullDay, t("طالب غاب كل الحصص في يوم"), 262],
-    [t("حصص مسجلة"), ses.length, `${STATS.from} ← ${STATS.to}`, 220],
+    [t("حصص مسجلة"), ses.filter(s => !s.auto).length, `${STATS.from} ← ${STATS.to}`, 220],
     [t("متوسط يومي"), days.size ? (absTotal / days.size).toFixed(1) : "0", t("حالة غياب في اليوم"), 172]
   ]);
-  const byC = {}; ses.forEach(s => { byC[s.c] = byC[s.c] || {a:0, seats:0}; byC[s.c].a += s.absent.length; byC[s.c].seats += s.total; });
-  $("chClass").innerHTML = hbars(classIds().filter(c => !cf || c === cf).map(c => { const o = byC[c] || {a:0, seats:0}; return {label: classLabel(c), v: o.a, txt: `${o.a} · ${pct(o.a, o.seats)}%`, tip: `${classLabel(c)}: ${t("{n} حالة", {n: o.a})} · ${pct(o.a, o.seats)}%`}; }));
-  const byP = Array(n).fill(0); sesC.forEach(s => { if (s.p <= n) byP[s.p - 1] += s.absent.length; });
+  const byC = {}; ses.forEach(s => { byC[s.c] = byC[s.c] || {a:0, seats:0}; byC[s.c].a += s.absent.length; byC[s.c].seats += s.total; }); /* لكل شعبة غيابها كاملًا */
+  $("chClass").innerHTML = hbars(classIds().filter(inC).map(c => { const o = byC[c] || {a:0, seats:0}; return {label: classLabel(c), v: o.a, txt: `${o.a} · ${pct(o.a, o.seats)}%`, tip: `${classLabel(c)}: ${t("{n} حالة", {n: o.a})} · ${pct(o.a, o.seats)}%`}; }));
+  const byP = Array(n).fill(0); sesC.forEach(s => { if (s.p <= n) byP[s.p - 1] += countable(s, inC).length; });
   $("chPeriod").innerHTML = hbars(byP.map((v, i) => ({label: pname(i+1), v, tip: `${pname(i+1)}: ${t("{n} حالة", {n: v})}`})));
-  const dl = [...days].sort(), byD = {}; ses.forEach(s => byD[s.date] = (byD[s.date] || 0) + s.absent.length);
+  const dl = [...days].sort(), byD = {}; ses.forEach(s => byD[s.date] = (byD[s.date] || 0) + countable(s, inC).length);
   $("chDay").innerHTML = dl.length ? colChart(dl.map(d => ({v: byD[d], tip: `${dayName(d)} ${d}: ${t("{n} حالة", {n: byD[d]})}`})), dl[0], dl[dl.length-1]) : `<div class="empty">${esc(t("لا توجد بيانات في هذه الفترة"))}</div>`;
-  const wd = {}, wdd = {}; ses.forEach(s => { const w = new Date(s.date + "T12:00").getDay(); wd[w] = (wd[w] || 0) + s.absent.length; (wdd[w] = wdd[w] || new Set()).add(s.date); });
+  const wd = {}, wdd = {}; ses.forEach(s => { const w = new Date(s.date + "T12:00").getDay(); wd[w] = (wd[w] || 0) + countable(s, inC).length; (wdd[w] = wdd[w] || new Set()).add(s.date); });
   $("chWeek").innerHTML = hbars([0,1,2,3,4].map(w => { const k = wdd[w] ? wdd[w].size : 0, avg = k ? (wd[w] / k) : 0; return {label: (isEn() ? DAYS_EN : DAYS_AR)[w], v: avg, txt: avg.toFixed(1), tip: t("{d}: متوسط {a} حالة في اليوم ({n} يوم)", {d: (isEn() ? DAYS_EN : DAYS_AR)[w], a: avg.toFixed(1), n: k})}; }));
   const top = [...stuMap.values()].sort((a,b) => b.periods - a.periods || b.days.size - a.days.size).slice(0, 15);
   STATS.stuMap = stuMap;
   $("topStu").innerHTML = top.length ? `<table><thead><tr><th>${esc(t("الطالب"))}</th><th>${esc(t("الشعبة"))}</th><th>${esc(t("حصص"))}</th><th>${esc(t("أيام"))}</th></tr></thead><tbody>` + top.map(m => `<tr class="click" data-k="${esc(m.key)}"><td class="name">${esc(m.name)}</td><td>${esc(classLabel(m.id && IDX[m.id] ? IDX[m.id].c : m.c))}</td><td>${m.periods}</td><td>${m.days.size}</td></tr>`).join("") + `</tbody></table>` : `<div class="empty">${esc(t("لا يوجد غياب في هذه الفترة"))}</div>`;
-  const tm = {}; ses.forEach(s => { const k = s.teacher || "—"; tm[k] = tm[k] || {n:0, last:0, days:new Set()}; tm[k].n++; tm[k].days.add(s.date); tm[k].last = Math.max(tm[k].last, s.savedAt); });
+  const tm = {}; ses.filter(s => !s.auto).forEach(s => { const k = s.teacher || "—"; tm[k] = tm[k] || {n:0, last:0, days:new Set()}; tm[k].n++; tm[k].days.add(s.date); tm[k].last = Math.max(tm[k].last, s.savedAt); });
   const ta = Object.entries(tm).sort((a,b) => b[1].n - a[1].n);
   $("tAct").innerHTML = ta.length ? `<table><thead><tr><th>${esc(t("المعلم"))}</th><th>${esc(t("حصص"))}</th><th>${esc(t("أيام"))}</th><th>${esc(t("آخر تسجيل"))}</th></tr></thead><tbody>` + ta.map(([nm, o]) => `<tr><td class="name">${esc(nm)}</td><td>${o.n}</td><td>${o.days.size}</td><td>${o.last ? esc(fmtDT(o.last)) : "—"}</td></tr>`).join("") + `</tbody></table>` : `<div class="empty">${esc(t("لا يوجد نشاط في هذه الفترة"))}</div>`;
   $("stuDetail").hidden = true;
@@ -1543,7 +1741,7 @@ $("topStu").addEventListener("click", e => {
   const rows = m.list.slice().sort((a,b) => b.date.localeCompare(a.date) || a.p - b.p);
   const last = rows[0], lastPs = rows.filter(s => s.date === last.date).map(s => s.p);
   const home = m.id && IDX[m.id] ? IDX[m.id].c : m.c;
-  $("stuDetail").innerHTML = `<div class="sechead"><h2>${esc(m.name)} <small>${esc(classLabel(home))} · ${esc(t("{p} حصة في {d} يوم", {p: m.periods, d: m.days.size}))}</small></h2>${waBtnFor(m.id, m.name, home, last.date, lastPs)}</div><div class="scroll"><table><thead><tr><th>${esc(t("التاريخ"))}</th><th>${esc(t("اليوم"))}</th><th>${esc(t("الشعبة"))}</th><th>${esc(t("الحصة"))}</th><th>${esc(t("المعلم المشرف"))}</th></tr></thead><tbody>` + rows.map(s => `<tr><td>${s.date}</td><td>${esc(dayName(s.date))}</td><td>${esc(classLabel(s.c))}</td><td>${s.p}</td><td>${esc(s.teacher)}</td></tr>`).join("") + `</tbody></table></div><div class="row" style="margin-top:10px"><button class="btn small" id="closeDetail">${esc(t("إغلاق"))}</button></div>`;
+  $("stuDetail").innerHTML = `<div class="sechead"><h2>${esc(m.name)} <small>${esc(classLabel(home))} · ${esc(t("{p} حصة في {d} يوم", {p: m.periods, d: m.days.size}))}</small></h2>${waBtnFor(m.id, m.name, home, last.date, lastPs)}</div><div class="scroll"><table><thead><tr><th>${esc(t("التاريخ"))}</th><th>${esc(t("اليوم"))}</th><th>${esc(t("الشعبة"))}</th><th>${esc(t("الحصة"))}</th><th>${esc(t("المعلم المشرف"))}</th></tr></thead><tbody>` + rows.map(s => `<tr><td>${s.date}</td><td>${esc(dayName(s.date))}</td><td>${esc(classLabel(s.c))}${s.via ? `<small class="via">↔ ${esc(classLabel(s.via))}</small>` : ""}</td><td>${s.p}</td><td>${esc(s.teacher)}</td></tr>`).join("") + `</tbody></table></div><div class="row" style="margin-top:10px"><button class="btn small" id="closeDetail">${esc(t("إغلاق"))}</button></div>`;
   $("stuDetail").hidden = false; $("stuDetail").scrollIntoView({behavior:"smooth", block:"start"});
   $("closeDetail").onclick = () => $("stuDetail").hidden = true;
 });
@@ -1572,9 +1770,11 @@ function matrix(list, c){
     let e = extra.find(x => x.name === a.name); if (!e){ e = {id: a.id || "", n: a.n, name: a.name, gone: true}; extra.push(e); } return e;
   };
   const marks = recs.map(r => { const set = new Set(); if (r) r.absent.forEach(a => set.add(find(a))); return set; });
-  const rows = studs.concat(extra).map(s => { const cells = recs.map((r, i) => r ? marks[i].has(s) : null); return {s, cells, count: cells.filter(x => x === true).length}; });
+  /* حصة جزئية (من الشعبة المتنقلة فقط): بقية الطلاب لم يُسجَّلوا */
+  const rows = studs.concat(extra).map(s => { const cells = recs.map((r, i) => !r ? null : r.auto && !(r.lids || []).includes(s.id) ? null : marks[i].has(s)); return {s, cells, count: cells.filter(x => x === true).length}; });
   return {recs, rows};
 }
+const recTeacher = r => r.auto ? "↔ " + (r.links || []).map(classLabel).join("، ") : r.teacher + (r.links && r.links.length ? " (+↔ " + r.links.map(classLabel).join("، ") + ")" : "");
 function renderRecords(){
   if (!REC) return;
   const c = $("rcClass").value, only = $("rcOnly").checked, n = NP();
@@ -1583,7 +1783,7 @@ function renderRecords(){
     const {recs, rows} = matrix(REC.list, c), shown = only ? rows.filter(r => r.count) : rows, wa = isAdmin();
     let h = `<p style="margin:0 0 8px;font-weight:700">${esc(classLabel(c))} – ${esc(dayName(REC.date))} ${REC.date}</p><table><thead><tr><th>${esc(t("م"))}</th><th>${esc(t("اسم الطالب"))}</th>`;
     for (let p = 1; p <= n; p++) h += `<th>${pshort(p)}</th>`;
-    h += `<th>${esc(t("المجموع"))}</th>${wa ? `<th>${esc(t("ولي الأمر"))}</th>` : ""}</tr>` + ($("rcTeachers").checked ? `<tr class="teacher-row"><td colspan="2">${esc(t("المعلم المشرف"))}</td>` + recs.map(r => `<td>${r ? esc(r.teacher) : ""}</td>`).join("") + `<td></td>${wa ? "<td></td>" : ""}</tr>` : "") + `</thead><tbody>`;
+    h += `<th>${esc(t("المجموع"))}</th>${wa ? `<th>${esc(t("ولي الأمر"))}</th>` : ""}</tr>` + ($("rcTeachers").checked ? `<tr class="teacher-row"><td colspan="2">${esc(t("المعلم المشرف"))}</td>` + recs.map(r => `<td>${r ? esc(recTeacher(r)) : ""}</td>`).join("") + `<td></td>${wa ? "<td></td>" : ""}</tr>` : "") + `</thead><tbody>`;
     if (!shown.length) h += `<tr><td colspan="${n + 3 + (wa ? 1 : 0)}" class="empty">${esc(only ? t("لا يوجد غياب") : t("لا يوجد طلاب"))}</td></tr>`;
     shown.forEach(({s, cells, count}) => {
       const ps = cells.map((x, i) => x ? i + 1 : 0).filter(Boolean);
@@ -1592,7 +1792,7 @@ function renderRecords(){
     h += `<tr><th colspan="2">${esc(t("عدد الغائبين"))}</th>` + recs.map(r => `<th>${r ? r.absent.length : "—"}</th>`).join("") + `<th></th>${wa ? "<th></th>" : ""}</tr></tbody></table><p class="hint">${esc(t("الخلية المظللة: لم تُسجَّل الحصة · «{m}»: غائب", {m: MARK()}))}</p>`;
     $("dayTable").innerHTML = h;
   }
-  const L = REC.list.slice().sort((a,b) => classIds().indexOf(a.c) - classIds().indexOf(b.c) || a.p - b.p);
+  const L = REC.list.filter(s => !s.auto).sort((a,b) => classIds().indexOf(a.c) - classIds().indexOf(b.c) || a.p - b.p);
   $("dayList").innerHTML = L.length ? L.map(s => `<div class="item"><div class="grow"><div class="t1">${esc(classLabel(s.c))} · ${esc(pname(s.p))}</div><div class="t2">${esc(s.teacher)} · ${esc(t("غائب {a} من {n}", {a: s.absent.length, n: s.total}))}${s.absent.length ? " · " + s.absent.map(a => esc(a.name)).join("، ") : ""}</div></div><button class="btn small danger" data-del="${esc(s.c)}|${s.p}">${ic("trash")}${esc(t("حذف"))}</button></div>`).join("") : `<div class="empty">${esc(t("لا توجد حصص مسجلة في هذا اليوم"))}</div>`;
 }
 $("dayList").addEventListener("click", async e => {
@@ -1614,9 +1814,10 @@ function buildWs(sh){
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   const merges = [{s:{r:0,c:0}, e:{r:0,c:W-1}}]; if (sh.sub) merges.push({s:{r:1,c:0}, e:{r:1,c:W-1}});
   if (empty && W > 2) merges.push({s:{r:b0,c:1}, e:{r:b0,c:W-1}});
+  if (sh.foot && sh.footMerge) merges.push({s:{r:b1,c:0}, e:{r:b1,c:W-1}});
   ws["!merges"] = merges;
   ws["!cols"] = (sh.cols || []).map(w => ({wch: w}));
-  ws["!rows"] = aoa.map((_, r) => ({hpt: r === 0 ? 34 : r < h0 ? 24 : r < b0 ? (r === h0 ? 28 : (sh.head2H || 40)) : (sh.bodyH || 23)}));
+  ws["!rows"] = aoa.map((_, r) => ({hpt: r === 0 ? 34 : r < h0 ? 24 : r < b0 ? (r === h0 ? 28 : (sh.head2H || 40)) : r >= b1 && sh.footH ? sh.footH : (sh.bodyH || 23)}));
   ws["!print"] = { titleRows: b0, onePage: !!sh.onePage };
   const B = {style:"thin", color:{rgb:"000000"}}, BM = {style:"medium", color:{rgb:"000000"}};
   const fill = rgb => ({patternType:"solid", fgColor:{rgb}});
@@ -1684,7 +1885,7 @@ function exportBook(sheets, filename){
 function daySheet(list, date, c){
   const {recs, rows} = matrix(list, c), n = NP(), M = MARK();
   const head1 = [t("م"), t("اسم الطالب"), ...Array.from({length: n}, (_, i) => pshort(i + 1)), t("المجموع")];
-  const head2 = ["", t("المعلم المشرف"), ...recs.map(r => r ? r.teacher : t("لم تسجل")), ""];
+  const head2 = ["", t("المعلم المشرف"), ...recs.map(r => r ? recTeacher(r) : t("لم تسجل")), ""];
   const body = rows.map(({s, cells, count}) => [s.gone ? "" : s.n, s.name, ...cells.map(x => x ? M : ""), count || ""]);
   const foot = ["", t("عدد الغائبين"), ...recs.map(r => r ? r.absent.length : ""), rows.reduce((a, r) => a + r.count, 0)];
   /* مقاسات تناسب ورقة A4 عمودية: عرض كلي ≈ 95 حرفًا */
@@ -1696,23 +1897,23 @@ function daySheet(list, date, c){
   return { name: classLabel(c), title: schoolName(), sub: `${t("كشف الغياب اليومي")} — ${classLabel(c)} — ${dayName(date)} ${date}`,
     head: showT ? [head1, head2] : [head1], rows: body, foot, cols: [5, nameW, ...Array(n).fill(perW), 8], left: [1], mark: M,
     head2Sz: 9, head2H: Math.max(30, maxL * 12 + 8), bodyH: 20, bodySz: 11, onePage: true,
-    grey: (ri, ci) => ci >= 2 && ci < 2 + n && !recs[ci - 2] };
+    grey: (ri, ci) => ci >= 2 && ci < 2 + n && rows[ri] && rows[ri].cells[ci - 2] === null };
 }
 $("exDay").onclick = () => { const c = $("rcClass").value; if (REC && c) exportBook([daySheet(REC.list, REC.date, c)], `${t("غياب")} ${classLabel(c)} ${REC.date}`); };
 $("exDayAll").onclick = () => { if (REC) exportBook(classIds().map(c => daySheet(REC.list, REC.date, c)), `${t("غياب جميع الشعب")} ${REC.date}`); };
-function filtTxt(){ const {cf, pf} = statFilter(); return `${STATS.from} → ${STATS.to}` + (cf ? " — " + classLabel(cf) : "") + (pf ? " — " + pname(pf) : ""); }
+function filtTxt(){ const {cf, pf} = statFilter(); return `${STATS.from} → ${STATS.to}` + (cf ? " — " + filterLabel(cf) : "") + (pf ? " — " + pname(pf) : ""); }
 const sortSes = L => L.slice().sort((a,b) => a.date.localeCompare(b.date) || classIds().indexOf(a.c) - classIds().indexOf(b.c) || a.p - b.p);
 $("exAbs").onclick = () => {
   if (!STATS) return;
-  const rows = []; sortSes(statFilter().ses).forEach(s => s.absent.forEach(a => rows.push([rows.length + 1, s.date, dayName(s.date), classLabel(s.c), pname(s.p), a.name, s.teacher])));
+  const {inC, ses} = statFilter(), rows = []; sortSes(ses).forEach(s => countable(s, inC).forEach(a => rows.push([rows.length + 1, s.date, dayName(s.date), classLabel(s.c) + (a.via ? " ↔ " + classLabel(a.via) : ""), pname(s.p), a.name, s.teacher])));
   exportBook([{ name: t("حالات الغياب"), title: schoolName(), sub: `${t("كل حالات الغياب")} — ${filtTxt()}`, head: ["#", t("التاريخ"), t("اليوم"), t("الشعبة"), t("الحصة"), t("اسم الطالب"), t("المعلم المشرف")], rows, cols: [6, 13, 11, 12, 14, 36, 28], left: [5, 6] }], `${t("حالات الغياب")} ${STATS.from} - ${STATS.to}`);
 };
 $("exPer").onclick = () => {
   if (!STATS) return;
   const {cf, pf} = statFilter(), ps = pf ? [pf] : Array.from({length: NP()}, (_, i) => i + 1);
-  const base = STATS.sessions.filter(s => !cf || s.c === cf);
-  const sheets = ps.map(p => { const rows = []; sortSes(base.filter(s => s.p === p)).forEach(s => s.absent.forEach(a => rows.push([rows.length + 1, s.date, dayName(s.date), classLabel(s.c), a.name, s.teacher])));
-    return { name: pname(p), title: schoolName(), sub: `${t("غياب")} ${pname(p)} — ${STATS.from} → ${STATS.to}${cf ? " — " + classLabel(cf) : ""}`, head: ["#", t("التاريخ"), t("اليوم"), t("الشعبة"), t("اسم الطالب"), t("المعلم المشرف")], rows, cols: [6, 13, 11, 12, 36, 28], left: [4, 5] }; });
+  const inC = classFilter(cf), base = STATS.sessions.filter(s => inC(s.c));
+  const sheets = ps.map(p => { const rows = []; sortSes(base.filter(s => s.p === p)).forEach(s => countable(s, inC).forEach(a => rows.push([rows.length + 1, s.date, dayName(s.date), classLabel(s.c) + (a.via ? " ↔ " + classLabel(a.via) : ""), a.name, s.teacher])));
+    return { name: pname(p), title: schoolName(), sub: `${t("غياب")} ${pname(p)} — ${STATS.from} → ${STATS.to}${cf ? " — " + filterLabel(cf) : ""}`, head: ["#", t("التاريخ"), t("اليوم"), t("الشعبة"), t("اسم الطالب"), t("المعلم المشرف")], rows, cols: [6, 13, 11, 12, 36, 28], left: [4, 5] }; });
   exportBook(sheets, `${t("الغياب حسب الحصة")} ${STATS.from} - ${STATS.to}`);
 };
 $("exSum").onclick = () => {
@@ -1930,8 +2131,9 @@ function fillPhScope(){
 }
 function renderStudentsAdmin(prefer){
   const sel = $("mClass"), prev = (typeof prefer === "string" && prefer) || sel.value || ls.get("att.mclass") || S.c || "";
-  sel.innerHTML = classIds().map(c => `<option value="${esc(c)}">${esc(classLabel(c))}${isMobile(c) ? " · " + esc(t("متنقلة")) : ""} (${studentsOf(c).length})</option>`).join("");
+  sel.innerHTML = classOptions(null, c => `${classLabel(c)}${isMobile(c) ? " · " + t("متنقلة") : ""} (${studentsOf(c).length})`);
   if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
+  renderGroups();
   const c = sel.value, has = !!c, mob = has && isMobile(c);
   $("classBar").hidden = false;
   $("classBar").innerHTML = has ? `<span class="pill ${mob ? "mob" : ""}">${esc(mob ? t("شعبة متنقلة") : t("شعبة عادية"))}</span><span class="pill">${esc(t("{n} طالب", {n: studentsOf(c).length}))}</span><span class="grow"></span>
@@ -2061,6 +2263,87 @@ function openMobilePicker(c){
   q("#mpAll").onclick = () => { visible().forEach(p => add(p.id)); render(); };
   q("#mpNone").onclick = () => { visible().forEach(p => sel.delete(p.id)); render(); };
   render();
+}
+
+/* ================= مجموعات الشعب ================= */
+let GSORT = null;
+const grpCopy = () => GROUPS.map(g => ({ name: g.name, classes: g.classes.slice() }));
+async function saveGroups(list, msg){
+  try { applyStuRes(await api("apiSaveGroups", TOKEN, list)); renderStudentsAdmin(); if (msg) toast(msg); return true; }
+  catch(e){ toast(e.message); renderStudentsAdmin(); return false; }
+}
+function renderGroups(){
+  $("grpCount").textContent = GROUPS.length;
+  const free = classIds().filter(c => !groupOf(c));
+  $("grpHint").textContent = GROUPS.length
+    ? t("ترتيب المجموعات وشعبها يظهر في التسجيل والملخص والتقارير. اسحب المجموعة من المقبض لتغيير ترتيبها.") + (free.length ? " " + t("شعب خارج المجموعات: {n}", {n: free.length}) : "")
+    : t("جمّع الشعب الأساسية والمتنقلة في مجموعات (مثل: الصف العاشر، الصف الحادي عشر) لتظهر مرتبة في التسجيل والملخص والتقارير.");
+  $("grpList").innerHTML = GROUPS.map((g, i) => `<div class="drow grprow" data-g="${i}">${window.Sortable && GROUPS.length > 1 ? `<button class="grip" type="button" aria-label="${esc(t("اسحب لتغيير الترتيب"))}">${ic("grip")}</button>` : ""}<span class="num">${i + 1}</span>
+    <div class="nm"><b>${esc(g.name)}</b> <span class="pill">${esc(t("{n} شعبة", {n: g.classes.length}))}</span><div class="chips">${g.classes.map(c => `<span ${isMobile(c) ? 'class="mob"' : ""}>${esc(classLabel(c))}${isMobile(c) ? " · " + esc(t("متنقلة")) : ""}</span>`).join("") || `<span>${esc(t("لا توجد شعب في هذه المجموعة"))}</span>`}</div></div>
+    <div class="acts"><button class="btn small icon" type="button" data-gedit="${i}" title="${esc(t("تعديل"))}">${ic("pen")}</button><button class="btn small icon danger" type="button" data-gdel="${i}" title="${esc(t("حذف"))}">${ic("trash")}</button></div></div>`).join("")
+    || `<div class="empty">${esc(t("لا توجد مجموعات بعد"))}</div>`;
+  if (GSORT){ GSORT.destroy(); GSORT = null; }
+  if (window.Sortable && GROUPS.length > 1)
+    GSORT = Sortable.create($("grpList"), { handle: ".grip", animation: 160, ghostClass: "ghost", forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3, onEnd: ev => {
+      if (ev.oldIndex === ev.newIndex) return;
+      const L = grpCopy(), order = [...$("grpList").querySelectorAll(".grprow")].map(x => L[+x.dataset.g]);
+      GROUPS = order; renderGroups(); saveGroups(order, t("تم حفظ ترتيب المجموعات"));
+    } });
+}
+$("btnNewGroup").onclick = () => editGroup(-1);
+$("grpList").addEventListener("click", async e => {
+  const ed = e.target.closest("[data-gedit]"), dl = e.target.closest("[data-gdel]");
+  if (ed) editGroup(+ed.dataset.gedit);
+  if (dl){
+    const g = GROUPS[+dl.dataset.gdel]; if (!g) return;
+    if (!await confirmBox(esc(t("حذف مجموعة {g}؟ الشعب نفسها وطلابها لا تُحذف.", {g: g.name})), t("حذف"), true)) return;
+    saveGroups(grpCopy().filter((_, i) => i !== +dl.dataset.gdel), t("تم حذف المجموعة"));
+  }
+});
+/* إنشاء/تعديل مجموعة: الاسم، إضافة/حذف شعب، وترتيب الشعب داخلها */
+function editGroup(idx){
+  const g = idx >= 0 ? GROUPS[idx] : { name: "", classes: [] }, sel = g.classes.slice();
+  let srt = null;
+  const m = modal({ title: idx >= 0 ? t("تعديل مجموعة: {g}", {g: g.name}) : t("مجموعة جديدة"), wide: true, ok: t("حفظ المجموعة"),
+    body: `<div class="stack">
+      <div class="field"><label for="gmName">${esc(t("اسم المجموعة"))}</label><input id="gmName" value="${esc(g.name)}" placeholder="${esc(t("مثال: الصف العاشر"))}"></div>
+      <div><div class="lbl" style="margin-bottom:6px">${esc(t("شعب المجموعة بالترتيب"))} <span class="pill" id="gmN"></span></div><div class="dlist" id="gmList"></div>
+        <p class="hint" style="margin:6px 0 0">${esc(t("رتّب الشعب بالسحب من المقبض أو بالأسهم."))}</p></div>
+      <div><div class="lbl" style="margin-bottom:6px">${esc(t("إضافة شعب إلى المجموعة"))}</div>
+        <div class="seltop"><input id="gmQ" placeholder="${esc(t("بحث…"))}" style="flex:1 1 160px;width:auto"><button class="btn small" type="button" id="gmAllN">${esc(t("إضافة الشعب الأساسية غير المجمّعة"))}</button></div>
+        <div class="pick" id="gmPool" style="max-height:34vh"></div></div></div>`,
+    onOk: async bd => {
+      const name = norm(bd.querySelector("#gmName").value);
+      if (!name){ toast(t("اكتب اسم المجموعة")); return false; }
+      if (GROUPS.some((x, i) => i !== idx && nk(x.name) === nk(name))){ toast(t("يوجد مجموعة أخرى بالاسم نفسه")); return false; }
+      const L = grpCopy().map(x => ({ name: x.name, classes: x.classes.filter(c => !sel.includes(c)) })), ng = { name, classes: sel.slice() };
+      if (idx >= 0) L[idx] = ng; else L.push(ng);
+      return await saveGroups(L, idx >= 0 ? t("تم حفظ المجموعة") : t("تم إنشاء المجموعة")) ? true : false;
+    },
+    onClose: () => { if (srt) srt.destroy(); } });
+  const bd = m.bd, q = x => bd.querySelector(x);
+  const rList = () => {
+    q("#gmN").textContent = sel.length;
+    q("#gmList").innerHTML = sel.map((c, i) => `<div class="drow" data-c="${esc(c)}">${window.Sortable ? `<button class="grip" type="button">${ic("grip")}</button>` : ""}<span class="num">${i + 1}</span><div class="nm">${esc(classLabel(c))}${isMobile(c) ? `<small>${esc(t("شعبة متنقلة"))}</small>` : ""}</div><div class="acts"><button class="btn small icon" type="button" data-mv="-1" data-i="${i}" ${i ? "" : "disabled"} title="${esc(t("أعلى"))}">${ic("up")}</button><button class="btn small icon" type="button" data-mv="1" data-i="${i}" ${i < sel.length - 1 ? "" : "disabled"} title="${esc(t("أسفل"))}">${ic("down")}</button><button class="btn small icon danger" type="button" data-rm="${i}" title="${esc(t("إزالة"))}">${ic("x")}</button></div></div>`).join("")
+      || `<div class="empty">${esc(t("لم تُضف شعب بعد. اخترها من القائمة بالأسفل."))}</div>`;
+    if (srt){ srt.destroy(); srt = null; }
+    if (window.Sortable && sel.length > 1) srt = Sortable.create(q("#gmList"), { handle: ".grip", animation: 140, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3, onEnd: () => {
+      const order = [...q("#gmList").querySelectorAll(".drow")].map(x => x.dataset.c); sel.splice(0, sel.length, ...order); rList(); } });
+  };
+  const poolIds = () => { const s = nk(q("#gmQ").value); return classIds().filter(c => !sel.includes(c) && (!s || nk(classLabel(c)).includes(s))); };
+  const rPool = () => {
+    q("#gmPool").innerHTML = poolIds().map(c => { const og = groupOf(c), other = og && og !== g.name; return `<label><input type="checkbox" data-add="${esc(c)}"><span>${esc(classLabel(c))}${isMobile(c) ? " · " + esc(t("متنقلة")) : ""}</span><span class="pc">${other ? esc(t("في مجموعة {g} (ستُنقل)", {g: og})) : esc(t("{n} طالب", {n: studentsOf(c).length}))}</span></label>`; }).join("")
+      || `<div class="empty">${esc(t("لا توجد شعب أخرى"))}</div>`;
+  };
+  q("#gmPool").addEventListener("change", e => { const x = e.target.closest("[data-add]"); if (!x || !x.checked) return; sel.push(x.dataset.add); rList(); rPool(); });
+  q("#gmQ").addEventListener("input", rPool);
+  q("#gmAllN").onclick = () => { poolIds().filter(c => !isMobile(c) && !groupOf(c)).forEach(c => sel.push(c)); rList(); rPool(); };
+  q("#gmList").addEventListener("click", e => {
+    const mv = e.target.closest("[data-mv]"), rm = e.target.closest("[data-rm]");
+    if (mv){ const i = +mv.dataset.i, j = i + +mv.dataset.mv; if (j < 0 || j >= sel.length) return; [sel[i], sel[j]] = [sel[j], sel[i]]; rList(); }
+    if (rm){ sel.splice(+rm.dataset.rm, 1); rList(); rPool(); }
+  });
+  rList(); rPool();
 }
 
 /* إضافة طلاب: طالب واحد / لصق أسماء / من ملف */
