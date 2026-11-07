@@ -156,6 +156,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 .logo{font-family:var(--font-display);font-size:25px;color:var(--brand);text-align:center;margin:0 0 4px}
 .sub{text-align:center;color:var(--muted);margin:0 0 18px;line-height:1.6}
 .bigin{font-size:26px;text-align:center;letter-spacing:4px;font-weight:800;padding:13px;font-variant-numeric:tabular-nums}
+.pwbox{position:relative}
+.pwbox .bigin{width:100%;padding-inline:52px}
+.pweye{position:absolute;top:50%;left:6px;transform:translateY(-50%);width:42px;height:42px;border:0;border-radius:12px;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.pweye:hover,.pweye:focus-visible{background:var(--line);color:var(--ink)}
+.pweye[aria-pressed="true"]{color:var(--brand)}
 .err{color:var(--absent);font-size:14px;min-height:1.2em;margin:0;text-align:center}
 .lgfoot{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:10px}
 .result{background:var(--ok-soft);color:var(--ok);border-radius:14px;padding:14px;text-align:center;line-height:1.7}
@@ -426,7 +431,7 @@ code{background:var(--soft);border-radius:6px;padding:1px 6px;font-size:13px}
     <p class="sub" data-t>أول تشغيل: أنشئ حساب المسؤول الرئيسي</p>
     <form id="setupForm" class="stack">
       <div class="field"><label for="suName" data-t>الاسم</label><input id="suName" required value="أسعد الوائلي"></div>
-      <div class="field"><label for="suUser" data-t>الرقم السري</label><input id="suUser" type="password" class="bigin" required inputmode="numeric" autocomplete="off" dir="ltr"></div>
+      <div class="field"><label for="suUser" data-t>الرقم السري</label><div class="pwbox"><input id="suUser" type="password" class="bigin" required inputmode="numeric" autocomplete="off" dir="ltr"><button type="button" class="pweye" data-pw="suUser"><i data-ic="eye"></i></button></div></div>
       <p class="err" id="suErr"></p>
       <button class="btn primary block" type="submit" data-t>إنشاء الحساب والدخول</button>
     </form>
@@ -441,7 +446,7 @@ code{background:var(--soft);border-radius:6px;padding:1px 6px;font-size:13px}
       <p class="logo" data-t>تسجيل الدخول</p>
       <p class="sub" data-t>اكتب رقمك السري للدخول مباشرة إلى تسجيل الغياب</p>
       <form id="loginForm" class="stack">
-        <div class="field"><label for="lgUser" data-t>الرقم السري</label><input id="lgUser" type="password" class="bigin" required inputmode="numeric" autocomplete="current-password" dir="ltr" placeholder="• • • • •"></div>
+        <div class="field"><label for="lgUser" data-t>الرقم السري</label><div class="pwbox"><input id="lgUser" type="password" class="bigin" required inputmode="numeric" autocomplete="current-password" dir="ltr" placeholder="• • • • •"><button type="button" class="pweye" data-pw="lgUser"><i data-ic="eye"></i></button></div></div>
         <p class="err" id="lgErr"></p>
         <button class="btn go block" type="submit" id="lgBtn" data-t>دخول</button>
       </form>
@@ -557,14 +562,11 @@ code{background:var(--soft);border-radius:6px;padding:1px 6px;font-size:13px}
     <p class="hint" data-t>✓ = سُجّلت الحصة (والرقم عدد الغائبين). اضغط على الخلية لمعرفة المعلم.</p>
     <p class="hint" data-t>↔ = سُجّل طلاب الشعبة المتنقلة فقط، ولم تُسجَّل بقية الشعبة بعد.</p>
   </div>
-  <div class="grid2">
-    <div class="card"><h2><i data-ic="userx"></i><span data-t>الغائبون</span> <small id="absDate"></small></h2><div id="todayAbs"></div></div>
-    <div class="card"><h2><i data-ic="users"></i><span data-t>تسجيل المعلمين</span> <small id="tDate"></small></h2><div id="todayT"></div></div>
-  </div>
+  <div class="card"><h2><i data-ic="users"></i><span data-t>تسجيل المعلمين</span> <small id="tDate"></small></h2><div id="todayT"></div></div>
 
   <div class="card" style="margin-top:14px" id="pdCard">
     <h2><i data-ic="list"></i><span data-t>غياب حصة محددة</span> <small id="pdDate"></small></h2>
-    <p class="hint" style="margin:0 0 10px" data-t>غياب جميع الشعب في الحصة المختارة لليوم المحدد أعلاه، مع ملف Excel منسق وجاهز للطباعة.</p>
+    <p class="hint" style="margin:0 0 10px" data-t>غياب جميع الشعب في الحصة المختارة (أو في كل الحصص) لليوم المحدد أعلاه، مع ملف Excel منسق وجاهز للطباعة.</p>
     <div class="row">
       <div class="field"><label for="pdPeriod" data-t>الحصة</label><select id="pdPeriod"></select></div>
       <div class="field"><label for="pdClass" data-t>الشعب</label><select id="pdClass"></select></div>
@@ -572,7 +574,7 @@ code{background:var(--soft);border-radius:6px;padding:1px 6px;font-size:13px}
     <div class="pdsum" id="pdSum"></div>
     <div class="scroll" id="pdTable"></div>
     <div class="exrow" style="margin-top:12px">
-      <button class="btn primary" id="exPd"><i data-ic="download"></i><span data-t>Excel للطباعة: هذه الحصة</span></button>
+      <button class="btn primary" id="exPd"><i data-ic="download"></i><span id="exPd1" data-t>Excel للطباعة: هذه الحصة</span><span id="exPd0" hidden data-t>Excel للطباعة: كل الحصص (ورقة واحدة)</span></button>
       <button class="btn" id="exPdAll"><i data-ic="download"></i><span data-t>Excel: كل الحصص (ورقة لكل حصة)</span></button>
     </div>
   </div>
@@ -603,15 +605,6 @@ code{background:var(--soft);border-radius:6px;padding:1px 6px;font-size:13px}
     <div class="card"><h2 data-t>نشاط المعلمين</h2><div class="scroll" id="tAct"></div></div>
   </div>
   <div class="card" id="stuDetail" hidden style="margin-top:14px"></div>
-  <div class="card" style="margin-top:14px">
-    <h2><i data-ic="download"></i><span data-t>تصدير إلى Excel</span></h2>
-    <p class="hint" style="margin:0 0 10px" data-t>التصدير يلتزم بالفترة والشعبة والحصة المختارة أعلاه. الملفات منسقة وجاهزة للطباعة.</p>
-    <div class="exrow">
-      <button class="btn primary" id="exAbs"><i data-ic="download"></i><span data-t>كل حالات الغياب</span></button>
-      <button class="btn primary" id="exPer"><i data-ic="download"></i><span data-t>الغياب حسب الحصة</span></button>
-      <button class="btn primary" id="exSum"><i data-ic="download"></i><span data-t>إجمالي غياب الطلاب</span></button>
-    </div>
-  </div>
 </div>
 
 <!-- ===== السجلات ===== -->
@@ -1009,6 +1002,14 @@ Object.assign(EN, {
 "لم تُضف شعب بعد. اخترها من القائمة بالأسفل.":"No classes yet — pick them from the list below.","في مجموعة {g} (ستُنقل)":"in group {g} (will move)","لا توجد شعب أخرى":"No other classes",
 "اسم المجموعة طويل جدًا":"Group name is too long","عدد المجموعات كبير جدًا":"Too many groups"
 });
+/* الإصدار 4.1 */
+Object.assign(EN, {
+"غياب جميع الشعب في الحصة المختارة (أو في كل الحصص) لليوم المحدد أعلاه، مع ملف Excel منسق وجاهز للطباعة.":"Absences of all classes in the chosen period (or all periods) for the day selected above, with a formatted, print-ready Excel file.",
+"كل الحصص":"All periods","الحصص":"Periods","العدد":"Count","{n} حالة غياب":"{n} absences","سُجّلت {a} من {b} حصة":"{a} of {b} periods recorded",
+"Excel للطباعة: كل الحصص (ورقة واحدة)":"Print-ready Excel: all periods (one sheet)","غياب كل الحصص":"Absences, all periods",
+"المجموع: {n} طالب غائب · {c} حالة غياب · سُجّلت {a} من {b} حصة":"Total: {n} absent · {c} absences · {a} of {b} periods recorded",
+"إظهار الرقم السري":"Show PIN","إخفاء الرقم السري":"Hide PIN"
+});
 const EN_RE = [
   [/^هذه الحصة سجّلها (.+)، ولا يعدّلها إلا المسؤول$/, "This period was recorded by $1; only an admin can edit it"],
   [/^الملف يحتوي على اسم شعبة متنقلة: (.+)$/, "The file contains a mobile class name: $1"],
@@ -1018,7 +1019,7 @@ const EN_RE = [
 
 <script>
 "use strict";
-const VERSION = "4.0";
+const VERSION = "4.1";
 const DEF_SCHOOL = "مدرسة الإمام محمد بن عبدالله الخليلي للبنين (10-12)";
 const EN_SCHOOL = "Imam Mohammed bin Abdullah Al-Khalili School for Boys (10-12)";
 const DEF_WA = "السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب {student} المحترم\nنحيطكم علمًا بغياب ابنكم ({class}) يوم {day} {date} عن {periods}.\nنأمل متابعته، وشكرًا لتعاونكم.\n{school}";
@@ -1095,6 +1096,8 @@ const ICONS = {
   copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
   link:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
   info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
+  eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff:'<path d="M17.9 17.9A10.1 10.1 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.1-5.9M9.9 4.2A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2M1 1l22 22"/>',
   folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
   up:'<path d="m18 15-6-6-6 6"/>',
   down:'<path d="m6 9 6 6 6-6"/>',
@@ -1238,9 +1241,21 @@ function showLogin(){
   screen("s-login");
   $("tabs").hidden = true; $("userbar").hidden = true;
   $("loginBox").hidden = false; $("recBox").hidden = true;
-  $("lgErr").textContent = ""; $("lgUser").value = "";
+  $("lgErr").textContent = ""; $("lgUser").value = ""; pwShow("lgUser", false);
   setTimeout(() => $("lgUser").focus(), 50);
 }
+/* زر إظهار/إخفاء الرقم السري */
+function pwShow(id, on){
+  const inp = $(id), b = document.querySelector(`.pweye[data-pw="${id}"]`); if (!inp || !b) return;
+  inp.type = on ? "text" : "password"; b.setAttribute("aria-pressed", on ? "true" : "false");
+  const lab = t(on ? "إخفاء الرقم السري" : "إظهار الرقم السري"); b.setAttribute("aria-label", lab); b.title = lab;
+  b.innerHTML = ic(on ? "eyeoff" : "eye");
+}
+document.querySelectorAll(".pweye").forEach(b => {
+  pwShow(b.dataset.pw, false);
+  b.addEventListener("pointerdown", e => e.preventDefault()); /* يبقى التركيز ولوحة الأرقام مفتوحة */
+  b.addEventListener("click", () => { pwShow(b.dataset.pw, $(b.dataset.pw).type === "password"); });
+});
 function updateUserbar(){
   $("who").textContent = ME.name; $("whoRole").textContent = roleLabel(ME);
   $("av").textContent = (first(ME.name) || "؟").charAt(0);
@@ -1553,7 +1568,7 @@ function fillStatSels(){
   sp.innerHTML = `<option value="">${esc(t("كل الحصص"))}</option>` + opts;
   if ([...sp.options].some(o => o.value === v)) sp.value = v;
   const pp = $("pdPeriod"), w = pp.value || ls.get("att.pdP") || "1";
-  pp.innerHTML = opts; pp.value = [...pp.options].some(o => o.value === w) ? w : "1";
+  pp.innerHTML = `<option value="0">${esc(t("كل الحصص"))}</option>` + opts; pp.value = [...pp.options].some(o => o.value === w) ? w : "1";
 }
 function rangeDates(){
   const d = today(), r = $("stRange").value;
@@ -1631,7 +1646,7 @@ function renderToday(){
     [t("أعلى شعبة غيابًا"), tops.length ? topNames : "—", tops.length === 1 ? t("{n} غائبين في {p}", {n: mx, p: pname(best[tops[0]].p)}) : tops.length ? t("{n} غائبين في حصة واحدة", {n: mx}) : t("لا يوجد غياب"), 24],
     [t("متوسط الغياب للحصة"), done ? (absCases / done).toFixed(1) : "0", t("طالب في كل حصة"), 195]
   ]);
-  $("covDate").textContent = dd; $("absDate").textContent = dd; $("tDate").textContent = dd;
+  $("covDate").textContent = dd; $("tDate").textContent = dd;
   $("covMeter").style.width = pct(done, slots) + "%";
   $("covTxt").textContent = t(isT ? "اكتمل {p}% من حصص اليوم" : "اكتمل {p}% من حصص هذا اليوم", {p: pct(done, slots)});
   const tmap = {}; all.forEach(s => tmap[s.c + "|" + s.p] = s);
@@ -1645,8 +1660,6 @@ function renderToday(){
     return r + `<td>${dn}/${n}</td></tr>`; };
   x += GROUPS.length ? groupedIds().filter(g => g.ids.length).map(g => `<tr class="gh"><td colspan="${n + 2}">${esc(grpLabel(g.name))}</td></tr>` + g.ids.map(row).join("")).join("") : ids.map(row).join("");
   $("coverage").innerHTML = ids.length ? x + "</tbody></table>" : `<div class="empty">${esc(t("لا توجد شعب بعد"))}</div>`;
-  const g = {}; [...stu.values()].forEach(m => (g[m.c] = g[m.c] || []).push(m));
-  $("todayAbs").innerHTML = Object.keys(g).length ? ids.filter(c => g[c]).map(c => `<div class="absgrp"><b>${esc(classLabel(c))} <span class="pill">${g[c].length}</span></b>${g[c].sort((a,b) => cmp(a.name, b.name)).map(m => { const ps = [...new Set(m.ps)].sort((a,b)=>a-b); return `<div class="arow"><div class="grow">${esc(m.name)}<small>${esc((ps.length >= n ? t("اليوم كامل") : ps.map(pshort).join("، ")) + (m.via.size ? " · ↔ " + [...m.via].map(classLabel).join("، ") : ""))}</small></div>${waBtnFor(m.id, m.name, c, d, ps)}</div>`; }).join("")}</div>`).join("") : `<div class="allp">👏 ${esc(t(isT ? "لا يوجد غياب مسجّل اليوم" : "لا يوجد غياب مسجّل في هذا اليوم"))}</div>`;
   $("todayT").innerHTML = `<div class="lbl" style="margin-bottom:6px">${esc(t(isT ? "سجّلوا اليوم ({n})" : "سجّلوا ({n})", {n: tDone.size}))}</div><div class="chips" style="margin-bottom:12px">${[...tDone.entries()].sort((a,b) => b[1] - a[1]).map(([nm, k]) => `<span class="ok">${esc(nm)} · ${k}</span>`).join("") || `<span>${esc(t("لا أحد بعد"))}</span>`}</div>` +
     `<div class="lbl" style="margin-bottom:6px">${esc(t(isT ? "لم يسجّلوا بعد ({n})" : "لم يسجّلوا ({n})", {n: notYet.length}))}</div><div class="chips">${notYet.map(y => `<span class="no">${esc(y.name)}</span>`).join("") || `<span class="ok">${esc(t("الجميع سجّل 🎉"))}</span>`}</div>`;
 }
@@ -1666,8 +1679,41 @@ function pdData(p, f){
   });
   return { d, p, f, rows, notRec, part, recorded, normal };
 }
+/* كل الحصص: صف واحد لكل طالب غائب مع حصص غيابه، مرتبًا حسب الشعبة الأصلية */
+function pdAll(f){
+  const n = NP(), per = Array.from({length: n}, (_, i) => pdData(i + 1, f)), m = new Map();
+  const homeN = (id, c) => { const s = id && (CLASSES[c] || []).find(x => x.id === id); return s ? s.n : ""; };
+  per.forEach(D => D.rows.forEach(r => {
+    const k = r.id || (r.c + "|" + r.name), home = (r.id && IDX[r.id] && IDX[r.id].c) || r.mobHome || r.c;
+    if (!m.has(k)) m.set(k, { c: home, n: homeN(r.id, home) || (home === r.c ? r.n : ""), name: r.name, id: r.id, ps: new Set(), via: new Set() });
+    const x = m.get(k); x.ps.add(D.p); const v = r.via || (r.mobHome ? r.c : ""); if (v && v !== home) x.via.add(v);
+  }));
+  const ord = classIds(), rows = [...m.values()].map(x => Object.assign(x, { ps: [...x.ps].sort((a, b) => a - b), via: [...x.via] }))
+    .sort((a, b) => ord.indexOf(a.c) - ord.indexOf(b.c) || (a.n || 999) - (b.n || 999) || cmp(a.name, b.name));
+  const recorded = per.reduce((a, D) => a + D.recorded, 0), slots = per.reduce((a, D) => a + D.normal, 0);
+  return { d: STATS.dayDate || today(), f, rows, n, recorded, slots, cases: rows.reduce((a, r) => a + r.ps.length, 0) };
+}
+const psTxt = (ps, n) => ps.length >= n ? t("اليوم كامل") : ps.map(pshort).join("، ");
+function pdAllSheet(f){
+  const D = pdAll(f), fl = filterLabel(f);
+  const rows = D.rows.map((r, i) => [i + 1, classLabel(r.c), r.n || "", r.name, psTxt(r.ps, D.n), r.ps.length, r.via.length ? t("في {m}", {m: r.via.map(classLabel).join("، ")}) : ""]);
+  const foot = [t("المجموع: {n} طالب غائب · {c} حالة غياب · سُجّلت {a} من {b} حصة", {n: D.rows.length, c: D.cases, a: D.recorded, b: D.slots})];
+  return { name: t("كل الحصص"), title: schoolName(), sub: `${t("غياب كل الحصص")} — ${dayName(D.d)} ${D.d}${fl ? " — " + fl : ""}`,
+    head: ["#", t("الشعبة"), t("م"), t("اسم الطالب"), t("الحصص"), t("العدد"), t("ملاحظة")], rows, foot, footMerge: true, footH: 34,
+    cols: [5, 13, 5, 32, 22, 7, 14], left: [3, 4], bodyH: 21, bodySz: 11, onePage: rows.length <= 38 };
+}
+function renderPdAll(){
+  const D = pdAll($("pdClass").value), wa = isAdmin();
+  $("pdDate").textContent = `${dayName(D.d)} ${D.d}`;
+  $("pdSum").innerHTML = `<span class="pill ${D.rows.length ? "off" : "ok"}">${esc(t("{n} غائب", {n: D.rows.length}))}</span><span class="pill">${esc(t("{n} حالة غياب", {n: D.cases}))}</span><span class="pill">${esc(t("سُجّلت {a} من {b} حصة", {a: D.recorded, b: D.slots}))}</span>`;
+  $("pdTable").innerHTML = D.rows.length ? `<table><thead><tr><th>#</th><th>${esc(t("الشعبة"))}</th><th>${esc(t("م"))}</th><th>${esc(t("اسم الطالب"))}</th><th>${esc(t("الحصص"))}</th>${wa ? `<th>${esc(t("ولي الأمر"))}</th>` : ""}</tr></thead><tbody>`
+    + D.rows.map((r, i) => `<tr><td>${i + 1}</td><td>${esc(classLabel(r.c))}${r.via.length ? `<small class="via">↔ ${esc(r.via.map(classLabel).join("، "))}</small>` : ""}</td><td>${r.n || ""}</td><td class="name">${esc(r.name)}</td><td>${esc(psTxt(r.ps, D.n))}</td>${wa ? `<td>${waBtnFor(r.id, r.name, r.c, D.d, r.ps)}</td>` : ""}</tr>`).join("") + `</tbody></table>`
+    : `<div class="allp">👏 ${esc(t("لا يوجد غياب مسجّل في هذا اليوم"))}</div>`;
+}
 function renderPd(){
   if (!STATS) return;
+  const all = $("pdPeriod").value === "0"; $("exPd0").hidden = !all; $("exPd1").hidden = all;
+  if (all) return renderPdAll();
   const p = +$("pdPeriod").value || 1, D = pdData(p, $("pdClass").value), wa = isAdmin();
   $("pdDate").textContent = `${dayName(D.d)} ${D.d}`;
   $("pdSum").innerHTML = `<span class="pill ${D.rows.length ? "off" : "ok"}">${esc(t("{n} غائب", {n: D.rows.length}))}</span><span class="pill">${esc(t("سُجّلت {a} من {b} شعبة", {a: D.recorded, b: D.normal}))}</span>`
@@ -1689,7 +1735,7 @@ function pdSheet(p, f){
 }
 $("pdPeriod").addEventListener("change", () => { ls.set("att.pdP", $("pdPeriod").value); renderPd(); });
 $("pdClass").addEventListener("change", renderPd);
-$("exPd").onclick = () => { if (!STATS) return; const p = +$("pdPeriod").value || 1, f = $("pdClass").value; exportBook([pdSheet(p, f)], `${t("غياب")} ${pname(p)} ${STATS.dayDate}`); };
+$("exPd").onclick = () => { if (!STATS) return; const f = $("pdClass").value; if ($("pdPeriod").value === "0") return exportBook([pdAllSheet(f)], `${t("غياب كل الحصص")} ${STATS.dayDate}`); const p = +$("pdPeriod").value || 1; exportBook([pdSheet(p, f)], `${t("غياب")} ${pname(p)} ${STATS.dayDate}`); };
 $("exPdAll").onclick = () => { if (!STATS) return; const f = $("pdClass").value; exportBook(Array.from({length: NP()}, (_, i) => pdSheet(i + 1, f)), `${t("غياب الحصص")} ${STATS.dayDate}`); };
 
 function statFilter(){ const cf = $("stClass").value, pf = +$("stPeriod").value || 0, inC = classFilter(cf); return {cf, pf, inC, ses: STATS.sessions.filter(s => inC(s.c) && (!pf || s.p === pf))}; }
@@ -1902,26 +1948,6 @@ function daySheet(list, date, c){
 }
 $("exDay").onclick = () => { const c = $("rcClass").value; if (REC && c) exportBook([daySheet(REC.list, REC.date, c)], `${t("غياب")} ${classLabel(c)} ${REC.date}`); };
 $("exDayAll").onclick = () => { if (REC) exportBook(classIds().map(c => daySheet(REC.list, REC.date, c)), `${t("غياب جميع الشعب")} ${REC.date}`); };
-function filtTxt(){ const {cf, pf} = statFilter(); return `${STATS.from} → ${STATS.to}` + (cf ? " — " + filterLabel(cf) : "") + (pf ? " — " + pname(pf) : ""); }
-const sortSes = L => L.slice().sort((a,b) => a.date.localeCompare(b.date) || classIds().indexOf(a.c) - classIds().indexOf(b.c) || a.p - b.p);
-$("exAbs").onclick = () => {
-  if (!STATS) return;
-  const {inC, ses} = statFilter(), rows = []; sortSes(ses).forEach(s => countable(s, inC).forEach(a => rows.push([rows.length + 1, s.date, dayName(s.date), classLabel(s.c) + (a.via ? " ↔ " + classLabel(a.via) : ""), pname(s.p), a.name, s.teacher])));
-  exportBook([{ name: t("حالات الغياب"), title: schoolName(), sub: `${t("كل حالات الغياب")} — ${filtTxt()}`, head: ["#", t("التاريخ"), t("اليوم"), t("الشعبة"), t("الحصة"), t("اسم الطالب"), t("المعلم المشرف")], rows, cols: [6, 13, 11, 12, 14, 36, 28], left: [5, 6] }], `${t("حالات الغياب")} ${STATS.from} - ${STATS.to}`);
-};
-$("exPer").onclick = () => {
-  if (!STATS) return;
-  const {cf, pf} = statFilter(), ps = pf ? [pf] : Array.from({length: NP()}, (_, i) => i + 1);
-  const inC = classFilter(cf), base = STATS.sessions.filter(s => inC(s.c));
-  const sheets = ps.map(p => { const rows = []; sortSes(base.filter(s => s.p === p)).forEach(s => countable(s, inC).forEach(a => rows.push([rows.length + 1, s.date, dayName(s.date), classLabel(s.c) + (a.via ? " ↔ " + classLabel(a.via) : ""), a.name, s.teacher])));
-    return { name: pname(p), title: schoolName(), sub: `${t("غياب")} ${pname(p)} — ${STATS.from} → ${STATS.to}${cf ? " — " + filterLabel(cf) : ""}`, head: ["#", t("التاريخ"), t("اليوم"), t("الشعبة"), t("اسم الطالب"), t("المعلم المشرف")], rows, cols: [6, 13, 11, 12, 36, 28], left: [4, 5] }; });
-  exportBook(sheets, `${t("الغياب حسب الحصة")} ${STATS.from} - ${STATS.to}`);
-};
-$("exSum").onclick = () => {
-  if (!STATS || !STATS.stuMap) return;
-  const rows = [...STATS.stuMap.values()].sort((a,b) => b.periods - a.periods || cmp(a.name, b.name)).map((m, i) => { const ix = m.id && IDX[m.id]; return [i + 1, classLabel(ix ? ix.c : m.c), m.name, m.periods, m.days.size, ix && ix.phone ? fmtPhone(ix.phone) : ""]; });
-  exportBook([{ name: t("إجمالي الغياب"), title: schoolName(), sub: `${t("إجمالي غياب الطلاب")} — ${filtTxt()}`, head: ["#", t("الشعبة"), t("اسم الطالب"), t("عدد حصص الغياب"), t("عدد أيام الغياب"), t("هاتف ولي الأمر")], rows, cols: [6, 12, 36, 15, 15, 18], left: [2] }], `${t("إجمالي الغياب")} ${STATS.from} - ${STATS.to}`);
-};
 </script>
 
 <script>
