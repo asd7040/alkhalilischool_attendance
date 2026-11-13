@@ -1427,7 +1427,10 @@ function fitNames(){
     if (el.scrollWidth > el.clientWidth + 1){ sh.textContent = sh.dataset.s.replace(/ (بن|بنت) /g, " "); if (el.scrollWidth > el.clientWidth + 1) el.classList.add("two"); }
   });
 }
-let fitT = 0; window.addEventListener("resize", () => { clearTimeout(fitT); fitT = setTimeout(fitNames, 120); });
+let fitT = 0; const refit = () => { clearTimeout(fitT); fitT = setTimeout(fitNames, 120); };
+window.addEventListener("resize", refit);
+/* إعادة القياس بعد تحميل خط الصفحة (القياس بالخط البديل قبل التحميل يعطي عرضًا مختلفًا) */
+if (document.fonts){ document.fonts.ready.then(refit); try { document.fonts.addEventListener("loadingdone", refit); } catch(_){} }
 
 function setStatus(x, cls){ const s = $("status"); s.textContent = x; s.className = "status " + (cls || ""); }
 function fillSup(sel){
@@ -1495,7 +1498,7 @@ function renderRoll(){
     const btns = ["p", "l", "a"].map(k => `<button type="button" data-st="${k}" aria-pressed="${st === k}" aria-label="${esc(t(ST_LABEL[k]))}" title="${esc(t(ST_LABEL[k]))}" ${ro ? "disabled" : ""}><span class="lt" aria-hidden="true">${LT[k]}</span><span class="wd">${esc(t(ST_LABEL[k]))}</span></button>`).join("");
     return `<div class="stu ${st === "a" ? "absent" : st === "l" ? "late" : ""} ${ms?"linked":""} ${ro?"ro":""}" data-id="${esc(s.id)}"><span class="num">${s.n}</span><span class="nm" title="${esc(s.name)}"><span class="no">${s.n}.</span><span class="fl">${esc(s.name)}</span><span class="sh" data-s="${esc(sn)}">${esc(sn)}</span>${mob && s.home ? `<small>${esc(classLabel(s.home))}</small>` : ""}${ms ? `<small class="lk">↔ ${esc(t("في {m}", {m: classLabel(ms.c)}))}</small>` : ""}</span><div class="seg" role="group" aria-label="${esc(s.name)}">${btns}</div></div>`; }).join("")
     : `<div class="empty">${esc(q ? t("لا يوجد طالب بهذا الاسم") : t("لا يوجد طلاب في هذه الشعبة"))}</div>`;
-  fitNames();
+  fitNames(); requestAnimationFrame(fitNames);
   updateCounts();
 }
 function updateCounts(){
